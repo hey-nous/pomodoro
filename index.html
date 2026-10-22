@@ -1,39 +1,49 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://pomo.nous.my.id/" />
-    <meta name="description" content="Browser-based Pomodoro timer for focused work, study sessions, and task tracking with break cycles, session stats, and no account or tracking required." />
-    <title>Pomodoro by NousVault | focus timer</title>
-    <meta property="og:title" content="Pomodoro by NousVault | focus timer" />
-    <meta property="og:description" content="Browser-based Pomodoro timer for focused work, study sessions, and task tracking with break cycles, session stats, and no account or tracking required." />
+    <meta
+      name="description"
+      content="Pomodoro by Hey Nous — a calm, browser-based focus timer with task tracking, break cycles, session stats, and generated ambient sound. No account, no tracking, works offline."
+    />
+    <title>Pomodoro by Hey Nous | focus timer</title>
+    <meta property="og:title" content="Pomodoro by Hey Nous | focus timer" />
+    <meta
+      property="og:description"
+      content="A calm, browser-based Pomodoro focus timer with tasks, session stats, and on-device ambient sound. No account or tracking required."
+    />
     <meta property="og:url" content="https://pomo.nous.my.id/" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="NousVault Pomodoro" />
+    <meta property="og:site_name" content="Hey Nous Pomodoro" />
     <meta property="og:image" content="https://pomo.nous.my.id/assets/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://pomo.nous.my.id/assets/og-image.png" />
-    <meta name="twitter:title" content="Pomodoro by NousVault | focus timer" />
-    <meta name="twitter:description" content="Browser-based Pomodoro timer for focused work, study sessions, and task tracking with break cycles, session stats, and no account or tracking required." />
-    <link rel="icon" href="assets/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/svg+xml" href="assets/nousvault-mark.svg" />
-    <link rel="shortcut icon" href="assets/favicon.ico" />
-    <link rel="apple-touch-icon" href="assets/nousvault-mark.svg" />
+    <meta name="twitter:title" content="Pomodoro by Hey Nous | focus timer" />
+    <meta
+      name="twitter:description"
+      content="A calm, browser-based Pomodoro focus timer with tasks, session stats, and on-device ambient sound. No account or tracking required."
+    />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="apple-touch-icon" href="assets/favicon.svg" />
+    <meta name="theme-color" content="#F7F3EC" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0D1220" media="(prefers-color-scheme: dark)" />
+    <link rel="manifest" href="manifest.json" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
-      "name": "Pomodoro by NousVault",
+      "name": "Pomodoro by Hey Nous",
       "url": "https://pomo.nous.my.id",
       "description": "Browser-based Pomodoro timer for focused work, study sessions, and task tracking with break cycles, session stats, and no account or tracking required.",
       "applicationCategory": "Productivity",
@@ -44,426 +54,306 @@
   </head>
   <body>
     <header class="topbar">
-      <h1>
-        <svg class="brand-mark" viewBox="0 0 361 236" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-          <path d="M0 0H60V236H0V0Z" fill="currentColor"></path>
-          <path d="M60 99.5V0L238 236H160L60 99.5Z" fill="currentColor"></path>
-          <path d="M248.5 219L214 172L300.918 0H361L248.5 219Z" fill="currentColor"></path>
-          <path d="M248.5 119.5L248 219L84 0H161L248.5 119.5Z" fill="currentColor"></path>
-          <path d="M148 82.5L161 0L277 159L248 219L148 82.5Z" fill="currentColor"></path>
-        </svg>
-        <span>Pomodoro</span>
-        <small>by <a class="brand-link" href="https://x.com/nousvault" target="_blank" rel="noreferrer noopener">NousVault</a></small>
-      </h1>
-      <nav class="topnav" aria-label="Primary navigation">
-        <button id="navHome" class="nav-button" type="button" aria-label="Go to home">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="nav-icon">
-            <path
-              d="M2 12.2039C2 9.91549 2 8.77128 2.5192 7.82274C3.0384 6.87421 3.98695 6.28551 5.88403 5.10813L7.88403 3.86687C9.88939 2.62229 10.8921 2 12 2C13.1079 2 14.1106 2.62229 16.116 3.86687L18.116 5.10812C20.0131 6.28551 20.9616 6.87421 21.4808 7.82274C22 8.77128 22 9.91549 22 12.2039V13.725C22 17.6258 22 19.5763 20.8284 20.7881C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.7881C2 19.5763 2 17.6258 2 13.725V12.2039Z"
-              stroke="#000000"
-              stroke-width="1.5"
-            ></path>
-            <path d="M15 18H9" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path>
-          </svg>
-          <span class="nav-label">Home</span>
+      <div class="wordmark">Pomodoro<span class="dot">.</span><small>by Hey Nous</small></div>
+      <nav class="topnav" aria-label="Primary">
+        <button id="navHome" type="button">Home</button>
+        <button id="navSummary" type="button">Summary</button>
+        <button id="ambienceOpen" type="button" aria-haspopup="dialog">
+          <span class="live-dot" aria-hidden="true"></span>Ambience
         </button>
-        <span class="nav-divider" aria-hidden="true"></span>
-        <button id="navSummary" class="nav-button" type="button" aria-label="Open activity summary">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="nav-icon">
-            <g>
-              <path d="M3 10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H13C16.7712 2 18.6569 2 19.8284 3.17157C21 4.34315 21 6.22876 21 10V14C21 17.7712 21 19.6569 19.8284 20.8284C18.6569 22 16.7712 22 13 22H11C7.22876 22 5.34315 22 4.17157 20.8284C3 19.6569 3 17.7712 3 14V10Z" stroke="#000000" stroke-width="1.5"></path>
-              <path d="M8 12H16" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path>
-              <path d="M8 8H16" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path>
-              <path d="M8 16H13" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path>
-            </g>
+        <button id="settingsOpen" type="button" aria-haspopup="dialog">Settings</button>
+        <button id="themeToggle" class="theme-icon" type="button" aria-label="Toggle dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19" />
           </svg>
-          <span class="nav-label">Summary</span>
-        </button>
-        <span class="nav-divider" aria-hidden="true"></span>
-        <button id="settingsOpen" class="nav-button" type="button" aria-label="Open settings" aria-haspopup="dialog">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="nav-icon settings-nav-icon">
-            <g>
-              <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M15.5699 18.5001V14.6001" stroke="#000000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M15.5699 7.45V5.5" stroke="#000000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M15.57 12.65C17.0059 12.65 18.17 11.4859 18.17 10.05C18.17 8.61401 17.0059 7.44995 15.57 7.44995C14.134 7.44995 12.97 8.61401 12.97 10.05C12.97 11.4859 14.134 12.65 15.57 12.65Z" stroke="#000000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M8.43005 18.5V16.55" stroke="#000000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M8.43005 9.4V5.5" stroke="#000000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
-              <path d="M8.42996 16.5501C9.8659 16.5501 11.03 15.386 11.03 13.9501C11.03 12.5142 9.8659 11.3501 8.42996 11.3501C6.99402 11.3501 5.82996 12.5142 5.82996 13.9501C5.82996 15.386 6.99402 16.5501 8.42996 16.5501Z" stroke="#000000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
-            </g>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" />
           </svg>
-          <span class="nav-label">Settings</span>
         </button>
       </nav>
     </header>
 
-    <main class="page-shell">
-      <section class="main-card sketch-border double-border" aria-label="Pomodoro timer">
-        <section class="timer-column">
-          <div class="timer-header">
-            <div class="tabs" role="tablist" aria-label="Timer modes">
-              <button class="tab active" type="button" data-mode="focus">Focus</button>
-              <button class="tab" type="button" data-mode="short">Short Break</button>
-              <button class="tab" type="button" data-mode="long">Long Break</button>
-            </div>
-            <button id="homeMusic" class="home-music" type="button" aria-label="Open background music" aria-haspopup="dialog">
-              <span class="home-music-label">Music</span>
-              <span class="home-music-live" aria-hidden="true"></span>
-            </button>
+    <main class="app">
+      <div id="timerView">
+        <section class="card timer-card" aria-label="Pomodoro timer">
+          <div class="seg" role="tablist" aria-label="Timer mode">
+            <button class="tab" role="tab" type="button" data-mode="focus" aria-selected="true">Focus</button>
+            <button class="tab" role="tab" type="button" data-mode="short" aria-selected="false">Short Break</button>
+            <button class="tab" role="tab" type="button" data-mode="long" aria-selected="false">Long Break</button>
           </div>
 
-          <div class="timer-stage">
-            <div id="timerDisplay" class="timer-display" aria-live="polite">25:00</div>
-            <button id="startStop" class="primary-button" type="button">START</button>
-          </div>
+          <div id="timerDisplay" class="timer" aria-live="polite">25:00</div>
 
           <div class="journey" aria-label="Timer progress">
-            <div class="journey-line"></div>
-            <div id="runnerCat" class="runner-cat" aria-hidden="true">
-              <div class="tiny-cat"></div>
+            <div class="journey-top">
+              <div id="journeyWalker" class="journey-badge walker" aria-hidden="true">
+                <span class="walker-art state-walking"></span>
+              </div>
+              <div class="journey-badge goal" aria-hidden="true">
+                <span class="goal-art state-coffeecup"></span>
+              </div>
             </div>
-            <div class="food-tray" aria-hidden="true">
-              <div class="food-face"></div>
+            <div class="journey-track">
+              <div id="journeyFill" class="journey-fill"></div>
             </div>
           </div>
 
-          <div class="dashed-separator"></div>
-
-          <section class="tasks-panel" aria-labelledby="tasksTitle">
-            <div class="section-heading">
-              <h2 id="tasksTitle">Tasks</h2>
-              <button id="addTask" class="plus-button" type="button" aria-label="Add task">+</button>
-            </div>
-            <ul id="taskList" class="task-list"></ul>
-          </section>
+          <button id="startStop" class="btn-primary" type="button">START</button>
         </section>
 
-        <aside class="info-column">
-          <section class="character-card sketch-border" aria-label="Pomodoro character">
-            <div id="characterArt" class="cat-illustration state-cover" aria-hidden="true"></div>
-            <p id="speechBubble" class="speech-bubble" aria-live="polite">
-              Welcome back. Pick a task, press start, and let the small steps stack up.
-            </p>
-          </section>
+        <section class="companion" aria-label="Nous companion">
+          <div id="companionArt" class="pose-frame state-cover" aria-hidden="true"></div>
+          <p id="companionLine" class="companion-line" aria-live="polite">Pick a task, press start.</p>
+        </section>
 
-          <section class="stats-card sketch-border" aria-labelledby="sessionInfo">
-            <h2 id="sessionInfo">SESSION INFO</h2>
-            <dl class="stats-list">
-              <div class="stat-row">
-                <dt>Completed</dt>
-                <dd id="completedCount">0</dd>
-              </div>
-              <div class="stat-row">
-                <dt>Total Focus</dt>
-                <dd id="totalFocus">0m</dd>
-              </div>
-            </dl>
-            <button id="openActivitySummary" class="activity-button" type="button">See Activity Summary</button>
-          </section>
-        </aside>
-
-        <section id="activitySummary" class="activity-summary sketch-border" aria-labelledby="activityTitle" hidden>
-          <button id="backToTimer" class="summary-back" type="button" aria-label="Back to timer">&lt;</button>
-          <header class="summary-header">
-            <h2 id="activityTitle">Activity Summary</h2>
-            <div class="summary-header-actions">
-              <button id="summaryReset" class="summary-reset" type="button" aria-label="Reset summary">Reset</button>
-            </div>
-            <span aria-hidden="true"></span>
-          </header>
-
-          <div class="summary-metrics" aria-label="Activity totals">
-            <article class="summary-metric sketch-border">
-              <div class="metric-icon metric-hours" aria-hidden="true">
-                <svg viewBox="0 0 511.999 511.999" role="presentation">
-                  <circle style="fill:#CFF09E;" cx="256.004" cy="269.446" r="123.49"></circle>
-                  <g>
-                    <path
-                      style="fill:#507C5C;"
-                      d="M255.999,406.537c-75.588,0-137.083-61.495-137.083-137.083S180.411,132.37,255.999,132.37 s137.083,61.495,137.083,137.083S331.588,406.537,255.999,406.537z M255.999,159.553c-60.599,0-109.9,49.301-109.9,109.9 s49.301,109.9,109.9,109.9s109.9-49.301,109.9-109.9S316.598,159.553,255.999,159.553z"
-                    ></path>
-                    <path
-                      style="fill:#507C5C;"
-                      d="M316.302,283.044H256c-7.506,0-13.591-6.085-13.591-13.591v-61.235 c0-7.506,6.085-13.591,13.591-13.591s13.591,6.085,13.591,13.591v47.645h46.71c7.506,0,13.591,6.085,13.591,13.591 S323.807,283.044,316.302,283.044z"
-                    ></path>
-                    <path
-                      style="fill:#507C5C;"
-                      d="M493.07,58.995c-13.003-13.722-31.306-21.592-50.216-21.592c-17.741,0-34.606,6.711-47.501,18.899 l-11.407,10.533c-2.671,2.465-4.243,5.899-4.364,9.533c-0.121,3.633,1.218,7.164,3.719,9.802l28.887,30.484l-9.701,9.212 c-38.493-39.273-91.112-61.553-146.486-61.553c-57.283,0-109.149,23.611-146.402,61.6l-9.778-9.265l28.88-30.476 c2.499-2.638,3.84-6.169,3.719-9.802s-1.693-7.066-4.364-9.533l-11.407-10.533c-12.895-12.187-29.761-18.899-47.501-18.899 c-18.91,0-37.213,7.871-50.216,21.592c-26.234,27.684-25.054,71.55,2.63,97.784c0.042,0.041,0.086,0.08,0.129,0.121l11.47,10.59 c2.611,2.411,5.918,3.604,9.216,3.604c3.603,0,7.197-1.424,9.869-4.243l28.88-30.476l10.732,10.169 c-25.732,34.278-40.997,76.844-40.997,122.908c0,47.41,16.174,91.11,43.283,125.889l-20.642,19.561 c-5.449,5.163-5.68,13.765-0.516,19.214c2.672,2.82,6.267,4.243,9.867,4.243c3.356,0,6.718-1.235,9.347-3.725l20.043-18.992 c37.046,36.435,87.82,58.953,143.761,58.953s106.717-22.518,143.761-58.953l20.043,18.992c2.629,2.491,5.99,3.725,9.347,3.725 c3.6,0,7.195-1.423,9.867-4.243c5.163-5.449,4.931-14.051-0.516-19.214l-20.642-19.561c27.11-34.777,43.283-78.479,43.283-125.889 c0-7.506-6.085-13.591-13.591-13.591c-7.506,0-13.591,6.085-13.591,13.591c0,98.127-79.832,177.96-177.96,177.96 S78.039,367.58,78.039,269.453s79.834-177.96,177.96-177.96c52.158,0,101.513,22.775,135.411,62.484 c0.118,0.139,0.247,0.258,0.37,0.391c0.067,0.072,0.122,0.151,0.19,0.223c0.06,0.063,0.126,0.116,0.188,0.177 c0.156,0.156,0.315,0.307,0.478,0.454c0.231,0.213,0.468,0.419,0.709,0.613c0.043,0.034,0.088,0.068,0.132,0.102 c2.444,1.91,5.39,2.887,8.35,2.887c3.361,0,6.728-1.24,9.356-3.736l19.698-18.704l28.872,30.468 c2.671,2.819,6.264,4.243,9.869,4.243c3.299,0,6.605-1.193,9.216-3.604l11.47-10.59c0.044-0.041,0.087-0.08,0.129-0.121 C518.124,130.545,519.304,86.679,493.07,58.995z M41.74,138.417l-1.544-1.426c-16.747-15.93-17.442-42.513-1.536-59.299 c8.009-8.452,18.835-13.107,30.485-13.107c10.785,0,21.038,4.088,28.871,11.51c0.042,0.041,0.086,0.08,0.129,0.12l1.354,1.249 L41.74,138.417z M471.803,136.991l-1.544,1.426l-57.759-60.95l1.354-1.249c0.043-0.039,0.086-0.08,0.129-0.12 c7.833-7.422,18.086-11.51,28.871-11.51c11.649,0,22.476,4.655,30.485,13.107C489.245,94.478,488.551,121.061,471.803,136.991z"
-                    ></path>
-                  </g>
-                </svg>
-              </div>
-              <h3>Hours Focused</h3>
-              <strong id="summaryHours">--</strong>
-              <div class="metric-rule"></div>
-            </article>
-            <article class="summary-metric sketch-border">
-              <div class="metric-icon metric-days" aria-hidden="true">
-                <svg viewBox="0 0 32 32" role="presentation">
-                  <g transform="matrix(1,0,0,1,-144,-336)">
-                    <g transform="matrix(1.2381,0,0,1.04348,-98.1429,335.783)">
-                      <path
-                        d="M219,6.917C219,6.408 218.83,5.921 218.527,5.561C218.224,5.202 217.813,5 217.385,5C213.473,5 203.527,5 199.615,5C199.187,5 198.776,5.202 198.473,5.561C198.17,5.921 198,6.408 198,6.917C198,11.248 198,21.752 198,26.083C198,26.592 198.17,27.079 198.473,27.439C198.776,27.798 199.187,28 199.615,28C203.527,28 213.473,28 217.385,28C217.813,28 218.224,27.798 218.527,27.439C218.83,27.079 219,26.592 219,26.083C219,21.752 219,11.248 219,6.917Z"
-                        style="fill:#90e0ef;"
-                      ></path>
-                    </g>
-                    <path
-                      d="M167,340L161,340L161,339C161,338.448 160.552,338 160,338C159.448,338 159,338.448 159,339L159,340L153,340L153,339C153,338.448 152.552,338 152,338C151.448,338 151,338.448 151,339L151,340L149,340C148.204,340 147.441,340.316 146.879,340.879C146.316,341.441 146,342.204 146,343L146,363C146,363.796 146.316,364.559 146.879,365.121C147.441,365.684 148.204,366 149,366L171,366C171.796,366 172.559,365.684 173.121,365.121C173.684,364.559 174,363.796 174,363L174,343C174,342.204 173.684,341.441 173.121,340.879C172.559,340.316 171.796,340 171,340L169,340L169,339C169,338.448 168.552,338 168,338C167.448,338 167,338.448 167,339L167,340ZM172,348L172,363C172,363.265 171.895,363.52 171.707,363.707C171.52,363.895 171.265,364 171,364C171,364 149,364 149,364C148.735,364 148.48,363.895 148.293,363.707C148.105,363.52 148,363.265 148,363L148,348L172,348ZM169,342L169,343C169,343.552 168.552,344 168,344C167.448,344 167,343.552 167,343L167,342L161,342L161,343C161,343.552 160.552,344 160,344C159.448,344 159,343.552 159,343L159,342L153,342L153,343C153,343.552 152.552,344 152,344C151.448,344 151,343.552 151,343L151,342L149,342C148.735,342 148.48,342.105 148.293,342.293C148.105,342.48 148,342.735 148,343L148,346L172,346L172,343C172,342.735 171.895,342.48 171.707,342.293C171.52,342.105 171.265,342 171,342L169,342Z"
-                      style="fill:#1990a7;"
-                    ></path>
-                  </g>
-                </svg>
-              </div>
-              <h3>Days Accessed</h3>
-              <strong id="summaryDays">--</strong>
-              <div class="metric-rule"></div>
-            </article>
-            <article class="summary-metric summary-metric-active sketch-border">
-              <div class="metric-icon metric-streak" aria-hidden="true">
-                <svg viewBox="-33 0 255 255" role="presentation">
-                  <g>
-                    <path
-                      d="M187.899,164.809 C185.803,214.868 144.574,254.812 94.000,254.812 C42.085,254.812 -0.000,211.312 -0.000,160.812 C-0.000,154.062 -0.121,140.572 10.000,117.812 C16.057,104.191 19.856,95.634 22.000,87.812 C23.178,83.513 25.469,76.683 32.000,87.812 C35.851,94.374 36.000,103.812 36.000,103.812 C36.000,103.812 50.328,92.817 60.000,71.812 C74.179,41.019 62.866,22.612 59.000,9.812 C57.662,5.384 56.822,-2.574 66.000,0.812 C75.352,4.263 100.076,21.570 113.000,39.812 C131.445,65.847 138.000,90.812 138.000,90.812 C138.000,90.812 143.906,83.482 146.000,75.812 C148.365,67.151 148.400,58.573 155.999,67.813 C163.226,76.600 173.959,93.113 180.000,108.812 C190.969,137.321 187.899,164.809 187.899,164.809 Z"
-                      id="path-1"
-                      class="cls-3"
-                      fill-rule="evenodd"
-                    ></path>
-                    <path
-                      d="M94.000,254.812 C58.101,254.812 29.000,225.711 29.000,189.812 C29.000,168.151 37.729,155.000 55.896,137.166 C67.528,125.747 78.415,111.722 83.042,102.172 C83.953,100.292 86.026,90.495 94.019,101.966 C98.212,107.982 104.785,118.681 109.000,127.812 C116.266,143.555 118.000,158.812 118.000,158.812 C118.000,158.812 125.121,154.616 130.000,143.812 C131.573,140.330 134.753,127.148 143.643,140.328 C150.166,150.000 159.127,167.390 159.000,189.812 C159.000,225.711 129.898,254.812 94.000,254.812 Z"
-                      id="path-2"
-                      class="cls-4"
-                      fill-rule="evenodd"
-                    ></path>
-                    <path
-                      d="M95.000,183.812 C104.250,183.812 104.250,200.941 116.000,223.812 C123.824,239.041 112.121,254.812 95.000,254.812 C77.879,254.812 69.000,240.933 69.000,223.812 C69.000,206.692 85.750,183.812 95.000,183.812 Z"
-                      id="path-3"
-                      class="cls-5"
-                      fill-rule="evenodd"
-                    ></path>
-                  </g>
-                  <defs>
-                    <linearGradient id="linear-gradient-1" gradientUnits="userSpaceOnUse" x1="94.141" y1="255" x2="94.141" y2="0.188">
-                      <stop offset="0" stop-color="#ff4d4d"></stop>
-                      <stop offset="1" stop-color="#d61f2c"></stop>
-                    </linearGradient>
-                    <style>
-                      .cls-3 { fill: url(#linear-gradient-1); }
-                      .cls-4 { fill: #ff5a52; }
-                      .cls-5 { fill: #ffb3ad; }
-                    </style>
-                  </defs>
-                </svg>
-              </div>
-              <h3>Day Streak</h3>
-              <strong id="summaryStreak">0</strong>
-              <div class="metric-rule"></div>
-            </article>
+        <section class="stats" aria-label="Session stats">
+          <div class="stat">
+            <div class="v" id="completedCount">0</div>
+            <div class="l">Completed</div>
           </div>
-
-          <section class="summary-chart-card sketch-border" aria-labelledby="focusHoursTitle">
-            <div class="chart-head">
-              <h3 id="focusHoursTitle">Focus Hours</h3>
-              <div class="chart-controls" aria-label="Chart controls">
-                <div class="range-tabs" role="tablist" aria-label="Activity range">
-                  <button class="range-tab active" type="button" data-range="week">Week</button>
-                  <button class="range-tab" type="button" data-range="month">Month</button>
-                  <button class="range-tab" type="button" data-range="year">Year</button>
-                </div>
-                <button id="summaryPrev" class="chart-step" type="button" aria-label="Previous period">&lt;</button>
-                <span id="summaryPeriod" class="chart-period">This Week</span>
-                <button id="summaryNext" class="chart-step" type="button" aria-label="Next period">&gt;</button>
-              </div>
+          <div class="stat">
+            <div class="v" id="totalFocus">0m</div>
+            <div class="l">Total focus</div>
+          </div>
+          <div class="stat">
+            <div class="v">
+              <span id="streakCount">0</span>
+              <svg class="freeze" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <path d="M12 2v20M4 6l16 12M20 6L4 18M12 2l-2.5 2.5M12 2l2.5 2.5M12 22l-2.5-2.5M12 22l2.5-2.5" />
+              </svg>
+              <span id="freezeCount" class="freeze-n">1</span>
             </div>
-
-            <div class="chart-area">
-              <div class="y-axis" aria-hidden="true">
-                <span>1.0</span>
-                <span>0.8</span>
-                <span>0.6</span>
-                <span>0.4</span>
-                <span>0.2</span>
-                <span>0</span>
-              </div>
-              <div id="summaryBars" class="summary-bars" aria-label="Focus hours chart"></div>
+            <div class="l">Day streak</div>
+          </div>
+          <div class="stat">
+            <div class="v">
+              <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+                <circle cx="22" cy="22" r="18" class="ring-bg" />
+                <circle id="goalRingFg" cx="22" cy="22" r="18" class="ring-fg" />
+              </svg>
+              <span id="goalText">0/8</span>
             </div>
+            <div class="l">Daily goal</div>
+          </div>
+        </section>
 
-            <div class="summary-dash"></div>
-            <p class="summary-footnote">* This report uses local activity saved in this browser.</p>
-          </section>
+        <section class="card" aria-labelledby="tasksTitle">
+          <div class="tasks-head">
+            <h2 id="tasksTitle">Tasks</h2>
+          </div>
+          <ul id="taskList" class="task-list"></ul>
+          <button id="addTask" class="add-task" type="button">+ Add task</button>
+        </section>
+
+        <button id="openActivitySummary" class="btn-subtle" type="button">See Activity Summary</button>
+      </div>
+
+      <section id="activitySummary" class="summary-view" aria-labelledby="activityTitle" hidden>
+        <button id="backToTimer" class="back-btn" type="button" aria-label="Back to timer">&#8592;</button>
+        <header class="summary-header">
+          <h2 id="activityTitle">Activity Summary</h2>
+          <button id="summaryReset" class="btn-ghost" type="button">Reset</button>
+        </header>
+
+        <div class="metrics">
+          <article class="card metric">
+            <div class="v" id="summaryHours">--</div>
+            <div class="l">Hours Focused</div>
+          </article>
+          <article class="card metric">
+            <div class="v" id="summaryDays">--</div>
+            <div class="l">Days Accessed</div>
+          </article>
+          <article class="card metric">
+            <div class="v" id="summaryStreak">0</div>
+            <div class="l">Day Streak</div>
+          </article>
+        </div>
+
+        <section class="card" aria-labelledby="focusHoursTitle">
+          <div class="chart-head">
+            <h3 id="focusHoursTitle">Focus Hours</h3>
+            <div class="seg seg-sm" role="tablist" aria-label="Activity range">
+              <button class="range-tab" type="button" data-range="week" aria-selected="true">Week</button>
+              <button class="range-tab" type="button" data-range="month" aria-selected="false">Month</button>
+              <button class="range-tab" type="button" data-range="year" aria-selected="false">Year</button>
+            </div>
+          </div>
+          <div class="chart-nav">
+            <button id="summaryPrev" class="chev" type="button" aria-label="Previous period">&#8249;</button>
+            <span id="summaryPeriod" class="period">This Week</span>
+            <button id="summaryNext" class="chev" type="button" aria-label="Next period">&#8250;</button>
+          </div>
+          <div id="summaryBars" class="bars" aria-label="Focus hours chart"></div>
+          <p class="footnote">* Local activity saved in this browser.</p>
         </section>
       </section>
     </main>
 
-    <div id="summaryConfirmOverlay" class="summary-confirm-overlay" hidden>
-      <section
-        class="summary-confirm-dialog sketch-border"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="summaryConfirmTitle"
-      >
+    <footer class="footer">Pomodoro by Hey Nous &middot; your data never leaves this browser</footer>
+
+    <div id="summaryConfirmOverlay" class="overlay" hidden>
+      <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="summaryConfirmTitle">
         <h3 id="summaryConfirmTitle">Reset activity summary?</h3>
-        <p>This will clear the saved focus history and counters for the summary view.</p>
-        <div class="summary-confirm-actions">
-          <button id="summaryConfirmCancel" class="summary-confirm-cancel" type="button">Cancel</button>
-          <button id="summaryConfirmOk" class="summary-confirm-ok" type="button">Reset</button>
+        <p>This will clear the saved focus history and counters.</p>
+        <div class="dialog-actions">
+          <button id="summaryConfirmCancel" class="btn-ghost" type="button">Cancel</button>
+          <button id="summaryConfirmOk" class="btn-primary btn-danger" type="button">Reset</button>
         </div>
       </section>
     </div>
 
-    <div id="musicOverlay" class="music-overlay" hidden>
-      <section class="music-dialog" role="dialog" aria-modal="true" aria-labelledby="musicTitle">
-        <div class="music-body">
-          <section class="music-player-panel">
-            <button id="musicClose" class="music-close" type="button" aria-label="Minimize music player">—</button>
-            <div class="music-now-playing">
-              <p>Now Playing</p>
-              <h3 id="musicTitle">Lofi Playlist</h3>
-              <span id="musicTrackArtist">YouTube</span>
-            </div>
-
-            <div id="musicEmbed" class="music-embed" aria-label="YouTube playlist player"></div>
-
-            <div class="music-controls">
-              <button id="musicPrev" type="button">Prev</button>
-              <button id="musicPlayPause" type="button">Play</button>
-              <button id="musicNext" type="button">Next</button>
-            </div>
-          </section>
+    <div id="ambienceOverlay" class="overlay" hidden>
+      <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="ambienceTitle">
+        <h3 id="ambienceTitle">Background ambience</h3>
+        <p class="dialog-note">Generated on-device &middot; works offline</p>
+        <div class="amb-options" role="group" aria-label="Ambience sound">
+          <button class="amb-btn" type="button" data-sound="off">Off</button>
+          <button class="amb-btn" type="button" data-sound="rain">Rain</button>
+          <button class="amb-btn" type="button" data-sound="white">White noise</button>
+          <button class="amb-btn" type="button" data-sound="brown">Brown noise</button>
+        </div>
+        <label class="setting-row">
+          <span>Volume</span>
+          <span class="inline-input">
+            <input id="panelAmbienceVolume" type="range" min="0" max="100" step="1" />
+            <output id="panelAmbienceVolumeValue">50</output>
+          </span>
+        </label>
+        <div class="dialog-actions">
+          <button id="ambienceClose" class="btn-primary" type="button">Done</button>
         </div>
       </section>
     </div>
 
-    <div id="settingsOverlay" class="settings-overlay" hidden>
-      <section
-        class="settings-dialog sketch-border"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="settingsTitle"
-      >
-        <aside class="settings-rail" aria-label="Settings sections">
-          <label class="settings-search" for="settingsSearch">
-            <span aria-hidden="true"></span>
-            <input id="settingsSearch" type="search" placeholder="Search" autocomplete="off" />
-          </label>
-          <p>Settings</p>
-          <a href="#timerSettings">Timer</a>
-          <a href="#taskSettings">Task</a>
-          <a href="#soundSettings">Sound</a>
-          <a href="#themeSettings">Theme</a>
-          <a href="#aboutSettings">About</a>
-        </aside>
-
-        <div class="settings-content">
-          <header class="settings-header">
-            <h2 id="settingsTitle">SETTING</h2>
-            <button id="settingsClose" class="settings-close" type="button" aria-label="Close settings">x</button>
-          </header>
-
-          <form id="settingsForm" class="settings-form">
-            <section id="timerSettings" class="settings-section">
-              <h3><span aria-hidden="true">o</span> TIMER</h3>
-              <fieldset>
-                <legend>Time (minutes)</legend>
-                <div class="minutes-grid">
-                  <label>
-                    <span>Pomodoro</span>
-                    <input id="settingFocusMinutes" type="number" min="1" max="180" step="1" />
-                  </label>
-                  <label>
-                    <span>Short Break</span>
-                    <input id="settingShortMinutes" type="number" min="1" max="60" step="1" />
-                  </label>
-                  <label>
-                    <span>Long Break</span>
-                    <input id="settingLongMinutes" type="number" min="1" max="90" step="1" />
-                  </label>
-                </div>
-              </fieldset>
-
-              <label class="setting-row">
-                <span>Auto Start Breaks</span>
-                <input id="settingAutoStartBreaks" class="switch-input" type="checkbox" />
-                <span class="switch-ui" aria-hidden="true"></span>
+    <div id="settingsOverlay" class="overlay" hidden>
+      <section class="dialog dialog-wide" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <header class="dialog-head">
+          <h2 id="settingsTitle">Settings</h2>
+          <button id="settingsClose" class="icon-btn" type="button" aria-label="Close settings">&times;</button>
+        </header>
+        <form id="settingsForm">
+          <section class="settings-section" aria-label="Timer settings">
+            <h3>Timer</h3>
+            <div class="minutes-grid">
+              <label>
+                <span>Focus (min)</span>
+                <input id="settingFocusMinutes" type="number" min="1" max="180" step="1" />
               </label>
-
-              <label class="setting-row">
-                <span>Auto Start Pomodoros</span>
-                <input id="settingAutoStartPomodoros" class="switch-input" type="checkbox" />
-                <span class="switch-ui" aria-hidden="true"></span>
+              <label>
+                <span>Short break (min)</span>
+                <input id="settingShortMinutes" type="number" min="1" max="60" step="1" />
               </label>
-
-              <label class="setting-row">
-                <span>Long Break Interval</span>
+              <label>
+                <span>Long break (min)</span>
+                <input id="settingLongMinutes" type="number" min="1" max="90" step="1" />
+              </label>
+            </div>
+            <label class="setting-row">
+              <span>Auto-start breaks</span>
+              <input id="settingAutoStartBreaks" class="switch" type="checkbox" />
+            </label>
+            <label class="setting-row">
+              <span>Auto-start pomodoros</span>
+              <input id="settingAutoStartPomodoros" class="switch" type="checkbox" />
+            </label>
+            <label class="setting-row">
+              <span>Long break every</span>
+              <span class="inline-input">
                 <input id="settingLongBreakInterval" class="compact-input" type="number" min="2" max="12" step="1" />
-              </label>
-            </section>
+                sessions
+              </span>
+            </label>
+            <label class="setting-row">
+              <span>Daily goal</span>
+              <span class="inline-input">
+                <input id="settingDailyGoal" class="compact-input" type="number" min="1" max="20" step="1" />
+                sessions
+              </span>
+            </label>
+          </section>
 
-            <section id="taskSettings" class="settings-section">
-              <h3><span aria-hidden="true">x</span> TASK</h3>
-              <label class="setting-row">
-                <span>Auto Check Tasks</span>
-                <input id="settingAutoCheckTasks" class="switch-input" type="checkbox" />
-                <span class="switch-ui" aria-hidden="true"></span>
-              </label>
+          <section class="settings-section" aria-label="Task settings">
+            <h3>Tasks</h3>
+            <label class="setting-row">
+              <span>Auto-check first task on focus complete</span>
+              <input id="settingAutoCheckTasks" class="switch" type="checkbox" />
+            </label>
+            <label class="setting-row">
+              <span>Move checked tasks to bottom</span>
+              <input id="settingCheckToBottom" class="switch" type="checkbox" />
+            </label>
+          </section>
 
-              <label class="setting-row">
-                <span>Check to Bottom</span>
-                <input id="settingCheckToBottom" class="switch-input" type="checkbox" />
-                <span class="switch-ui" aria-hidden="true"></span>
-              </label>
-            </section>
-
-            <section id="soundSettings" class="settings-section">
-              <h3><span aria-hidden="true">~</span> SOUND</h3>
-              <label class="setting-row">
-                <span>Alarm Sound</span>
-                <span class="sound-picker">
-                  <select id="settingAlarmSound"></select>
-                  <button id="testAlarmSound" class="mini-action sound-test" type="button">Test</button>
-                </span>
-              </label>
-              <label class="setting-row slider-row">
-                <span>Alarm Volume</span>
+          <section class="settings-section" aria-label="Sound settings">
+            <h3>Sound</h3>
+            <label class="setting-row">
+              <span>Alarm sound</span>
+              <span class="sound-picker">
+                <select id="settingAlarmSound"></select>
+                <button id="testAlarmSound" class="btn-ghost" type="button">Test</button>
+              </span>
+            </label>
+            <label class="setting-row">
+              <span>Alarm volume</span>
+              <span class="inline-input">
                 <input id="settingAlarmVolume" type="range" min="0" max="100" step="1" />
                 <output id="alarmVolumeValue">50</output>
-              </label>
-              <label class="setting-row">
-                <span>Repeat</span>
-                <input id="settingAlarmRepeat" class="compact-input" type="number" min="3" max="3" step="1" disabled />
-              </label>
-            </section>
+              </span>
+            </label>
+            <label class="setting-row">
+              <span>Ambience</span>
+              <select id="settingAmbienceSound">
+                <option value="off">Off</option>
+                <option value="rain">Rain</option>
+                <option value="white">White noise</option>
+                <option value="brown">Brown noise</option>
+              </select>
+            </label>
+            <label class="setting-row">
+              <span>Ambience volume</span>
+              <span class="inline-input">
+                <input id="settingAmbienceVolume" type="range" min="0" max="100" step="1" />
+                <output id="ambienceVolumeValue">50</output>
+              </span>
+            </label>
+            <p class="dialog-note">Ambience is generated on-device and works offline.</p>
+          </section>
 
-            <section id="themeSettings" class="settings-section">
-              <h3><span aria-hidden="true">*</span> THEME</h3>
-              <div class="setting-row theme-row">
-                <span>Color Themes</span>
-                <div class="swatches" role="radiogroup" aria-label="Color themes">
-                  <button class="swatch swatch-red" type="button" data-theme="#B94A50" aria-label="Red theme"></button>
-                  <button class="swatch swatch-teal" type="button" data-theme="#2B7E7C" aria-label="Teal theme"></button>
-                  <button class="swatch swatch-blue" type="button" data-theme="#2F6F9F" aria-label="Blue theme"></button>
-                  <button class="swatch swatch-yellow" type="button" data-theme="#FCD660" aria-label="Yellow theme"></button>
-                </div>
+          <section class="settings-section" aria-label="Appearance settings">
+            <h3>Appearance</h3>
+            <div class="setting-row">
+              <span>Theme</span>
+              <div class="seg seg-sm theme-seg" role="group" aria-label="Theme">
+                <button type="button" data-theme-val="light">Light</button>
+                <button type="button" data-theme-val="dark">Dark</button>
               </div>
-              <label class="setting-row">
-                <span>Hour Format</span>
-                <select id="settingHourFormat">
-                  <option value="24">24-hour</option>
-                  <option value="12">12-hour</option>
-                </select>
-              </label>
-            </section>
-            <p id="settingsEmpty" class="settings-empty">No settings match your search.</p>
-            <section id="aboutSettings" class="settings-section">
-              <h3><span aria-hidden="true">*</span> ABOUT</h3>
-              <div class="about-settings-body">
-                <p>Pomodoro by NousVault is a browser-based focus timer for deep work, study sessions, and task tracking with break cycles, session stats, and no account or tracking required.</p>
-                <p>Run Pomodoro cycles with focus rounds, short breaks, and long breaks. Track tasks, review activity summaries, and keep momentum during work blocks from desktop or mobile.</p>
-                <p>Useful for study sprints, coding sessions, writing blocks, revision cycles, and quiet solo planning. No setup, no account — just open the timer and start.</p>
-                <p class="about-settings-links">Related: <a href="https://tool.nous.my.id" target="_blank" rel="noopener">developer tools</a>, <a href="https://draw.nous.my.id" target="_blank" rel="noopener">free whiteboard</a>, <a href="https://nous.my.id" target="_blank" rel="noopener">NousVault</a></p>
-              </div>
-            </section>
-          </form>
-        </div>
+            </div>
+            <p class="dialog-note">Follows your system on first visit.</p>
+            <label class="setting-row">
+              <span>Hour format</span>
+              <select id="settingHourFormat">
+                <option value="24">24-hour</option>
+                <option value="12">12-hour</option>
+              </select>
+            </label>
+            <p class="dialog-note">Tip: press <kbd>Space</kbd> to start or stop the timer.</p>
+          </section>
+
+          <section class="settings-section" aria-label="About">
+            <h3>About</h3>
+            <p>
+              Pomodoro by Hey Nous is a focus timer that lives entirely in your browser &mdash;
+              no account, no tracking, and your data never leaves this device.
+            </p>
+            <p class="about-links">
+              Related: <a href="https://tool.nous.my.id" target="_blank" rel="noopener">developer tools</a>
+              &middot; <a href="https://draw.nous.my.id" target="_blank" rel="noopener">whiteboard</a>
+              &middot; <a href="https://nous.my.id" target="_blank" rel="noopener">Hey Nous</a>
+            </p>
+          </section>
+        </form>
       </section>
     </div>
 
