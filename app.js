@@ -793,6 +793,7 @@ function render() {
 
   const progress = getProgress();
   els.journeyWalker.style.setProperty("--progress", progress.toFixed(4));
+  els.journeyWalker.classList.toggle("is-walking", state.running);
   els.journeyFill.style.width = `${(progress * 100).toFixed(2)}%`;
 
   els.completedCount.textContent = state.completedFocus;
