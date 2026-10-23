@@ -275,12 +275,13 @@ html[data-theme="light"] .icon-moon {
 
 /* ---------- timer ---------- */
 .timer {
-  font-family: "DM Serif Display", Georgia, serif;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 700;
   font-size: clamp(4.5rem, 20vw, 7.5rem);
   line-height: 1;
   text-align: center;
   margin: 14px 0 26px;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 
