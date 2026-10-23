@@ -147,20 +147,26 @@ button {
 }
 
 .theme-icon {
-  width: 48px !important;
+  width: 48px;
   height: 48px;
-  padding: 0 !important;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border) !important;
-  border-radius: 50% !important;
-  color: var(--ink) !important;
+  background: var(--chip);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.theme-icon:hover {
+  border-color: var(--text2);
 }
 
 .theme-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 
 html[data-theme="dark"] .icon-sun {
