@@ -697,23 +697,77 @@ html[data-theme="light"] .icon-moon {
   color: var(--text2);
 }
 
-.task-del {
-  background: none;
-  border: 0;
-  color: var(--text2);
-  font-size: 1.35rem;
-  line-height: 1;
+.task-menu-btn {
+  flex: 0 0 auto;
   width: 48px;
   height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
   border-radius: 12px;
+  color: var(--text2);
   cursor: pointer;
-  flex: 0 0 auto;
 }
 
-.task-del:hover {
+.task-menu-btn:hover {
+  background: var(--chip);
   color: var(--ink);
+}
+
+.task-menu-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.task-menu {
+  position: fixed;
+  z-index: 80;
+  width: 248px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 10px;
+}
+
+.task-menu[hidden] {
+  display: none;
+}
+
+.task-menu-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 4px 10px;
+}
+
+.task-menu-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.task-menu-del {
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: #e5484d;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.task-menu-del:hover {
   background: var(--chip);
 }
+
 
 .add-task {
   width: 100%;

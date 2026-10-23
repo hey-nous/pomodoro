@@ -153,6 +153,18 @@
           <button id="addTask" class="add-task" type="button">+ Add task</button>
         </section>
 
+        <div class="task-menu" id="taskMenu" hidden role="menu" aria-label="Task options">
+          <div class="task-menu-row">
+            <span class="task-menu-label">Estimate</span>
+            <div class="est">
+              <button type="button" id="menuEstMinus" aria-label="Decrease estimate">&#8722;</button>
+              <span class="est-n" id="menuEstN">1&#215;</span>
+              <button type="button" id="menuEstPlus" aria-label="Increase estimate">+</button>
+            </div>
+          </div>
+          <button type="button" id="menuDelete" class="task-menu-del">Delete task</button>
+        </div>
+
         <button id="openActivitySummary" class="btn-subtle" type="button">See Activity Summary</button>
       </div>
 

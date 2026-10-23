@@ -739,50 +739,27 @@ function renderTasks() {
     });
     input.addEventListener("focus", markAction);
 
-    const est = document.createElement("div");
-    est.className = "est";
-    const minus = document.createElement("button");
-    minus.type = "button";
-    minus.textContent = "\u2212";
-    minus.setAttribute("aria-label", "Decrease pomodoro estimate");
-    const estN = document.createElement("span");
-    estN.className = "est-n";
-    const plus = document.createElement("button");
-    plus.type = "button";
-    plus.textContent = "+";
-    plus.setAttribute("aria-label", "Increase pomodoro estimate");
-    const syncEst = () => {
-      estN.textContent = `${task.est}\u00d7`;
-      minus.disabled = task.est <= 1;
-      plus.disabled = task.est >= 20;
-    };
-    minus.addEventListener("click", () => {
-      task.est = Math.max(1, task.est - 1);
-      saveState();
-      syncEst();
-    });
-    plus.addEventListener("click", () => {
-      task.est = Math.min(20, task.est + 1);
-      saveState();
-      syncEst();
-    });
-    syncEst();
-    est.append(minus, estN, plus);
-
-    const remove = document.createElement("button");
-    remove.className = "task-del";
-    remove.type = "button";
-    remove.textContent = "\u00d7";
-    remove.setAttribute("aria-label", `Delete ${task.text || "task"}`);
-    remove.addEventListener("click", () => {
-      state.tasks = state.tasks.filter((candidate) => candidate.id !== task.id);
-      saveState();
-      renderTasks();
+    const menuBtn = document.createElement("button");
+    menuBtn.className = "task-menu-btn";
+    menuBtn.type = "button";
+    menuBtn.setAttribute("aria-label", `Options for ${task.text || "task"}`);
+    menuBtn.setAttribute("aria-expanded", "false");
+    menuBtn.setAttribute("aria-haspopup", "menu");
+    menuBtn.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>';
+    menuBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (taskMenu.hidden || menuTask?.id !== task.id) {
+        openTaskMenu(task, menuBtn);
+      } else {
+        closeTaskMenu();
+      }
     });
 
-    item.append(check, input, est, remove);
+    item.append(check, input, menuBtn);
     els.taskList.append(item);
   });
+  closeTaskMenu();
 }
 
 function render() {
@@ -1294,6 +1271,67 @@ document.addEventListener("click", (event) => {
 });
 topnav.addEventListener("click", (event) => {
   if (event.target.closest("button")) setMenu(false);
+});
+
+const taskMenu = document.getElementById("taskMenu");
+const menuEstMinus = document.getElementById("menuEstMinus");
+const menuEstN = document.getElementById("menuEstN");
+const menuEstPlus = document.getElementById("menuEstPlus");
+const menuDelete = document.getElementById("menuDelete");
+let menuTask = null;
+
+function syncMenuEst() {
+  if (!menuTask) return;
+  menuEstN.textContent = `${menuTask.est}\u00d7`;
+  menuEstMinus.disabled = menuTask.est <= 1;
+  menuEstPlus.disabled = menuTask.est >= 20;
+}
+
+function openTaskMenu(task, anchor) {
+  menuTask = task;
+  syncMenuEst();
+  taskMenu.hidden = false;
+  const rect = anchor.getBoundingClientRect();
+  taskMenu.style.top = `${Math.max(8, Math.min(rect.bottom + 8, window.innerHeight - 170))}px`;
+  taskMenu.style.left = "auto";
+  taskMenu.style.right = `${Math.max(8, window.innerWidth - rect.right)}px`;
+  anchor.setAttribute("aria-expanded", "true");
+}
+
+function closeTaskMenu() {
+  if (taskMenu.hidden) return;
+  taskMenu.hidden = true;
+  menuTask = null;
+  document
+    .querySelectorAll('.task-menu-btn[aria-expanded="true"]')
+    .forEach((btn) => btn.setAttribute("aria-expanded", "false"));
+}
+
+menuEstMinus.addEventListener("click", () => {
+  if (!menuTask) return;
+  menuTask.est = Math.max(1, menuTask.est - 1);
+  saveState();
+  syncMenuEst();
+});
+menuEstPlus.addEventListener("click", () => {
+  if (!menuTask) return;
+  menuTask.est = Math.min(20, menuTask.est + 1);
+  saveState();
+  syncMenuEst();
+});
+menuDelete.addEventListener("click", () => {
+  if (!menuTask) return;
+  state.tasks = state.tasks.filter((candidate) => candidate.id !== menuTask.id);
+  saveState();
+  renderTasks();
+});
+document.addEventListener("click", (event) => {
+  if (!taskMenu.hidden && !taskMenu.contains(event.target) && !event.target.closest(".task-menu-btn")) {
+    closeTaskMenu();
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !taskMenu.hidden) closeTaskMenu();
 });
 
 document.addEventListener("pointerdown", markAction);
