@@ -55,13 +55,15 @@
   <body>
     <header class="topbar">
       <div class="wordmark">Pomodoro<span class="dot">.</span><small>by Hey Nous</small></div>
-      <nav class="topnav" aria-label="Primary">
+      <nav class="topnav" id="topnav" aria-label="Primary">
         <button id="navHome" type="button">Home</button>
         <button id="navSummary" type="button">Summary</button>
         <button id="ambienceOpen" type="button" aria-haspopup="dialog">
           <span class="live-dot" aria-hidden="true"></span>Ambience
         </button>
         <button id="settingsOpen" type="button" aria-haspopup="dialog">Settings</button>
+      </nav>
+      <div class="top-actions">
         <button id="themeToggle" class="theme-icon" type="button" aria-label="Toggle dark mode">
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <circle cx="12" cy="12" r="4.2" />
@@ -71,7 +73,12 @@
             <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" />
           </svg>
         </button>
-      </nav>
+        <button id="menuToggle" class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="topnav">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      </div>
     </header>
 
     <main class="app">

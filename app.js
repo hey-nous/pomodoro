@@ -1278,6 +1278,24 @@ els.themeToggle.addEventListener("click", () => {
   setTheme(state.settings.theme === "dark" ? "light" : "dark");
 });
 
+const menuToggle = document.getElementById("menuToggle");
+const topnav = document.getElementById("topnav");
+function setMenu(open) {
+  topnav.classList.toggle("open", open);
+  menuToggle.setAttribute("aria-expanded", String(open));
+  menuToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+}
+menuToggle.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setMenu(!topnav.classList.contains("open"));
+});
+document.addEventListener("click", (event) => {
+  if (topnav.classList.contains("open") && !topnav.contains(event.target)) setMenu(false);
+});
+topnav.addEventListener("click", (event) => {
+  if (event.target.closest("button")) setMenu(false);
+});
+
 document.addEventListener("pointerdown", markAction);
 document.addEventListener("keydown", markAction);
 document.addEventListener("keydown", (event) => {
