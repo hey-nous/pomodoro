@@ -590,15 +590,19 @@ const ambienceEngine = {
     out.connect(this.master);
     const stopFns = [];
 
-    if (sound === "white" || sound === "brown") {
+    const loopNoise = ({ brown = false, type = "lowpass", freq = 8000, q = 0.7, gain = 0.4 }) => {
       const src = ctx.createBufferSource();
-      src.buffer = this.noiseBuffer(sound === "brown");
+      src.buffer = this.noiseBuffer(brown);
       src.loop = true;
       const filt = ctx.createBiquadFilter();
-      filt.type = "lowpass";
-      filt.frequency.value = sound === "brown" ? 900 : 12000;
+      filt.type = type;
+      filt.frequency.value = freq;
+      filt.Q.value = q;
+      const g = ctx.createGain();
+      g.gain.value = gain;
       src.connect(filt);
-      filt.connect(out);
+      filt.connect(g);
+      g.connect(out);
       src.start();
       stopFns.push(() => {
         try {
@@ -607,39 +611,69 @@ const ambienceEngine = {
           /* already stopped */
         }
       });
-    } else if (sound === "rain") {
-      const src = ctx.createBufferSource();
-      src.buffer = this.noiseBuffer(false);
-      src.loop = true;
-      const bp = ctx.createBiquadFilter();
-      bp.type = "bandpass";
-      bp.frequency.value = 2400;
-      bp.Q.value = 0.7;
-      const g = ctx.createGain();
-      g.gain.value = 0.5;
+      return { src, filt, g };
+    };
+
+    if (sound === "white") {
+      // softened hiss, like a distant waterfall
+      loopNoise({ brown: false, type: "lowpass", freq: 4500, gain: 0.32 });
+    } else if (sound === "brown") {
+      // deep rumble with a slow breathing swell
+      const { g } = loopNoise({ brown: true, type: "lowpass", freq: 520, gain: 0.5 });
       const lfo = ctx.createOscillator();
-      lfo.frequency.value = 0.15;
+      lfo.frequency.value = 0.07;
       const lfoGain = ctx.createGain();
-      lfoGain.gain.value = 0.12;
+      lfoGain.gain.value = 0.1;
       lfo.connect(lfoGain);
       lfoGain.connect(g.gain);
-      src.connect(bp);
-      bp.connect(g);
-      g.connect(out);
-      src.start();
       lfo.start();
       stopFns.push(() => {
-        try {
-          src.stop();
-        } catch (error) {
-          /* already stopped */
-        }
         try {
           lfo.stop();
         } catch (error) {
           /* already stopped */
         }
       });
+    } else if (sound === "rain") {
+      // low body rumble of steady rain
+      loopNoise({ brown: false, type: "lowpass", freq: 380, gain: 0.32 });
+      // pitter-patter: random droplet hits
+      const dropBuf = this.noiseBuffer(false);
+      const timer = setInterval(() => {
+        const n = 1 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < n; i += 1) {
+          const t = ctx.currentTime + Math.random() * 0.06;
+          const heavy = Math.random() < 0.18;
+          const src = ctx.createBufferSource();
+          src.buffer = dropBuf;
+          src.playbackRate.value = 0.8 + Math.random() * 0.7;
+          const bp = ctx.createBiquadFilter();
+          bp.type = "bandpass";
+          bp.frequency.value = heavy ? 380 + Math.random() * 520 : 1400 + Math.random() * 3200;
+          bp.Q.value = 7 + Math.random() * 5;
+          const g = ctx.createGain();
+          const peak = heavy ? 0.22 + Math.random() * 0.18 : 0.05 + Math.random() * 0.13;
+          const dur = heavy ? 0.09 + Math.random() * 0.06 : 0.03 + Math.random() * 0.05;
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(peak, t + 0.008);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          src.connect(bp);
+          bp.connect(g);
+          g.connect(out);
+          src.onended = () => {
+            src.disconnect();
+            bp.disconnect();
+            g.disconnect();
+          };
+          try {
+            src.start(t, Math.random() * 1.5, dur + 0.08);
+            src.stop(t + dur + 0.12);
+          } catch (error) {
+            /* skip this droplet */
+          }
+        }
+      }, 55);
+      stopFns.push(() => clearInterval(timer));
     }
 
     this.applyVolume();
@@ -659,7 +693,8 @@ const ambienceEngine = {
 
   applyVolume() {
     if (this.master) {
-      this.master.gain.value = (state.settings.ambienceVolume / 100) * 0.6;
+      const v = state.settings.ambienceVolume / 100;
+      this.master.gain.value = 0.6 * v * v;
     }
   },
 };
