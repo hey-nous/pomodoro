@@ -1442,3 +1442,68 @@ body::after {
   background: var(--accent);
   color: var(--on-accent);
 }
+
+/* ============ taste-skill v2 applied (2026-10-23) ============
+   Source: github.com/Leonxlnx/taste-skill — app-screens run.
+   Adapted: this is a timer app, so the big serif timer stays (the screen's
+   one question, answered by its biggest block). Locked tokens untouched. */
+
+/* A. Colour on data, not chrome: the mode switcher goes neutral, the
+   orange stays on what it measures (journey progress, goal ring). */
+.seg button[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(30, 36, 51, 0.14);
+}
+
+/* B. Flat surfaces: 1px borders separate, shadows only on what floats
+   (dialog, popover, menus keep theirs). A border or a shadow, never both. */
+.card,
+.companion {
+  box-shadow: none;
+}
+
+/* C. Sentence-case section labels (at most one tracked-uppercase label per
+   screen): quiet 600-weight labels, hairline rule kept under Tasks. */
+.card h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+/* D. Serif discipline — one face, distinct jobs: wordmark (product face),
+   timer (the figure), companion line (the greeting). Stats go back to the
+   text face: data reads as type, not decoration. */
+.stat .v,
+.metric .v {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+/* E. Group, don't box: the four stats become one divided strip. */
+.stats {
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.stat {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 16px 6px;
+}
+
+.stat + .stat {
+  border-left: 1px solid var(--border);
+}
+
+/* F. 700 does one job (key figures); the primary action steps to 600. */
+.btn-primary {
+  font-weight: 600;
+}
