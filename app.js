@@ -1211,6 +1211,9 @@ function resumeAmbience() {
   if (state.settings.ambienceSound !== "off" && !ambiencePlaying) {
     try {
       ambienceEngine.play(state.settings.ambienceSound);
+      // play() alone never refreshes the nav dot; without this the sound
+      // can resume while the UI still shows it as off.
+      renderAmbience();
     } catch (error) {
       /* stays silent until the next gesture */
     }
