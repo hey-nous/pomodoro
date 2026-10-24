@@ -5,7 +5,7 @@ const STORAGE_KEY = "nousvault-pomodoro-state-v1";
 const IDLE_AFTER_MS = 90_000;
 const ALARM_PLAY_COUNT = 3;
 const ALARM_PAUSE_MS = 1_000;
-const PAGE_TITLE = "Pomodoro by Hey Nous | focus timer";
+const PAGE_TITLE = "Free Online Pomodoro Timer | Pomodoro by Hey Nous";
 const RING_CIRCUMFERENCE = 113.1;
 
 const AUDIO_OPTIONS = [
