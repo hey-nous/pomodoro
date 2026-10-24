@@ -7,27 +7,41 @@
     <link rel="canonical" href="https://pomo.nous.my.id/" />
     <meta
       name="description"
-      content="Pomodoro by Hey Nous — a calm, browser-based focus timer with task tracking, break cycles, session stats, and generated ambient sound. No account, no tracking, works offline."
+      content="Free online Pomodoro timer by Hey Nous: focus sessions, short and long breaks, tasks, stats, and ambient sound. No account, no tracking, works offline."
     />
-    <title>Pomodoro by Hey Nous | focus timer</title>
-    <meta property="og:title" content="Pomodoro by Hey Nous | focus timer" />
+    <title>Free Online Pomodoro Timer | Pomodoro by Hey Nous</title>
+    <meta property="og:title" content="Free Online Pomodoro Timer | Pomodoro by Hey Nous" />
     <meta
       property="og:description"
-      content="A calm, browser-based Pomodoro focus timer with tasks, session stats, and on-device ambient sound. No account or tracking required."
+      content="Free online Pomodoro timer: focus sessions, breaks, tasks, stats, and ambient sound. No account or tracking required."
     />
     <meta property="og:url" content="https://pomo.nous.my.id/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Hey Nous Pomodoro" />
     <meta property="og:image" content="https://pomo.nous.my.id/assets/og-image.png" />
+    <meta property="og:image:alt" content="Pomodoro by Hey Nous — a minimal focus timer" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://pomo.nous.my.id/assets/og-image.png" />
-    <meta name="twitter:title" content="Pomodoro by Hey Nous | focus timer" />
+    <meta name="twitter:title" content="Free Online Pomodoro Timer | Pomodoro by Hey Nous" />
     <meta
       name="twitter:description"
-      content="A calm, browser-based Pomodoro focus timer with tasks, session stats, and on-device ambient sound. No account or tracking required."
+      content="Free online Pomodoro timer: focus sessions, breaks, tasks, stats, and ambient sound. No account or tracking required."
     />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Pomodoro by Hey Nous",
+        "url": "https://pomo.nous.my.id/",
+        "applicationCategory": "Productivity",
+        "operatingSystem": "Web browser",
+        "description": "Free online Pomodoro timer: focus sessions, short and long breaks, tasks, stats, and ambient sound. No account, no tracking, works offline.",
+        "author": { "@type": "Organization", "name": "Hey Nous", "url": "https://nous.my.id/" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <link rel="apple-touch-icon" href="assets/favicon.svg" />
     <meta name="theme-color" content="#F7F3EC" media="(prefers-color-scheme: light)" />
@@ -82,6 +96,7 @@
     </header>
 
     <main class="app">
+      <h1 class="visually-hidden">Free Online Pomodoro Timer</h1>
       <div id="timerView">
         <section class="card timer-card" aria-label="Pomodoro timer">
           <div class="seg" role="tablist" aria-label="Timer mode">
@@ -213,7 +228,7 @@
       </section>
     </main>
 
-    <footer class="footer">Pomodoro by Hey Nous &middot; your data never leaves this browser</footer>
+    <footer class="footer">Pomodoro by Hey Nous &middot; a free online Pomodoro timer for focused work and study &middot; your data never leaves this browser</footer>
 
     <div id="summaryConfirmOverlay" class="overlay" hidden>
       <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="summaryConfirmTitle">

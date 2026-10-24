@@ -1,1 +1,19 @@
-{"background_color":"#F7F3EC","description":"A calm, browser-based Pomodoro focus timer with tasks, session stats, and on-device ambient sound. No account or tracking required.","display":"standalone","icons":[{"purpose":"any","sizes":"any","src":"assets/favicon.svg","type":"image/svg+xml"}],"name":"Pomodoro by Hey Nous","orientation":"portrait","scope":"/","short_name":"Pomodoro","start_url":"/","theme_color":"#F7F3EC"}
+{
+  "background_color": "#F7F3EC",
+  "description": "Free online Pomodoro timer: focus sessions, breaks, tasks, stats, and ambient sound. No account or tracking required.",
+  "display": "standalone",
+  "icons": [
+    {
+      "purpose": "any",
+      "sizes": "any",
+      "src": "assets/favicon.svg",
+      "type": "image/svg+xml"
+    }
+  ],
+  "name": "Pomodoro by Hey Nous",
+  "orientation": "portrait",
+  "scope": "/",
+  "short_name": "Pomodoro",
+  "start_url": "/",
+  "theme_color": "#F7F3EC"
+}
