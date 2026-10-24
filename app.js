@@ -1,23 +1,27 @@
+/* Pomodoro by Hey Nous — client-only focus timer.
+ * State persists in localStorage under STORAGE_KEY (unchanged since v1). */
+
 const STORAGE_KEY = "nousvault-pomodoro-state-v1";
 const IDLE_AFTER_MS = 90_000;
 const ALARM_PLAY_COUNT = 3;
 const ALARM_PAUSE_MS = 1_000;
+const PAGE_TITLE = "Pomodoro by Hey Nous | focus timer";
+const RING_CIRCUMFERENCE = 113.1;
 
 const AUDIO_OPTIONS = [
   { label: "None", value: "None" },
-  { label: "Cat 1", value: "assets/audio/cat-1.wav" },
-  { label: "Cat 2", value: "assets/audio/cat-2.ogg" },
+  { label: "Playful 1", value: "assets/audio/cat-1.wav" },
+  { label: "Playful 2", value: "assets/audio/cat-2.ogg" },
   { label: "Digital", value: "assets/audio/digital.flac" },
   { label: "Door Chime", value: "assets/audio/door-chime.wav" },
 ];
 
-const MUSIC_PLAYLIST_ID = "PLiL-8m6bgAgHN38YhqXLvDsODsrBgeAFw";
-const MUSIC_PLAYLIST_TITLE = "Lofi Playlist";
-
-const DEFAULT_MUSIC = {
-  volume: 45,
-  playing: false,
-  playlistIndex: 0,
+const AMBIENCE_SOUNDS = ["off", "rain", "white", "brown"];
+const AMBIENCE_LABELS = {
+  off: "Off",
+  rain: "Rain",
+  white: "White noise",
+  brown: "Brown noise",
 };
 
 const MODES = {
@@ -33,12 +37,14 @@ const DEFAULT_SETTINGS = {
   autoStartBreaks: false,
   autoStartPomodoros: false,
   longBreakInterval: 4,
+  dailyGoal: 8,
   autoCheckTasks: false,
   checkToBottom: true,
   alarmSound: "assets/audio/door-chime.wav",
   alarmVolume: 50,
-  alarmRepeat: ALARM_PLAY_COUNT,
-  themeColor: "#FCD660",
+  ambienceSound: "off",
+  ambienceVolume: 50,
+  theme: "light",
   hourFormat: "24",
 };
 
@@ -47,34 +53,35 @@ function createId() {
   return `task-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-const DEFAULT_TASKS = [
-  { id: createId(), text: "Sketch the main landing page hero layout", done: true },
-  { id: createId(), text: "Refine Pomodoro interaction styles", done: false },
-];
+function makeDefaultTasks() {
+  return [];
+}
 
-const SPEECH = {
-  cover: "Welcome back. Pick a task, press start, and let the small steps stack up.",
-  focus: "Focus time, let's get sketching!",
-  almost: "A little more. The finish line is already in sight.",
-  timesup: "Time's up. Pencils down for one proud second.",
-  done: "Done. That focus session counts.",
-  break: "Rest time. Stretch, breathe, and let the page cool down.",
-  ignored: "Still here. The timer is waiting for your next tiny brave move.",
+const COMPANION_LINES = {
+  cover: "Pick a task, press start.",
+  focus: "Focus time \u2014 one thing at a time.",
+  almost: "Almost there \u2014 finish strong.",
+  timesup: "Time's up. Well done.",
+  done: "Session logged. Take a breath.",
+  break: "Rest \u2014 stretch and breathe.",
+  ignored: "Still here when you're ready.",
 };
 
 const els = {
-  topbar: document.querySelector(".topbar"),
   tabs: [...document.querySelectorAll(".tab")],
   timerDisplay: document.querySelector("#timerDisplay"),
   startStop: document.querySelector("#startStop"),
-  runnerCat: document.querySelector("#runnerCat"),
-  characterArt: document.querySelector("#characterArt"),
-  speechBubble: document.querySelector("#speechBubble"),
-  mainCard: document.querySelector(".main-card"),
+  resetTimer: document.querySelector("#resetTimer"),
+  completeBanner: document.querySelector("#completeBanner"),
+  journeyWalker: document.querySelector("#journeyWalker"),
+  journeyFill: document.querySelector("#journeyFill"),
+  companionArt: document.querySelector("#companionArt"),
+  companionLine: document.querySelector("#companionLine"),
+  timerView: document.querySelector("#timerView"),
   activitySummary: document.querySelector("#activitySummary"),
   openActivitySummary: document.querySelector("#openActivitySummary"),
   backToTimer: document.querySelector("#backToTimer"),
-  homeMusic: document.querySelector("#homeMusic"),
+  ambienceOpen: document.querySelector("#ambienceOpen"),
   summaryReset: document.querySelector("#summaryReset"),
   summaryHours: document.querySelector("#summaryHours"),
   summaryDays: document.querySelector("#summaryDays"),
@@ -86,71 +93,65 @@ const els = {
   summaryConfirmOverlay: document.querySelector("#summaryConfirmOverlay"),
   summaryConfirmCancel: document.querySelector("#summaryConfirmCancel"),
   summaryConfirmOk: document.querySelector("#summaryConfirmOk"),
-  musicOverlay: document.querySelector("#musicOverlay"),
-  musicClose: document.querySelector("#musicClose"),
-  musicTrackTitle: document.querySelector("#musicTitle"),
-  musicTrackArtist: document.querySelector("#musicTrackArtist"),
-  musicPlayPause: document.querySelector("#musicPlayPause"),
-  musicPrev: document.querySelector("#musicPrev"),
-  musicNext: document.querySelector("#musicNext"),
-  musicEmbed: document.querySelector("#musicEmbed"),
+  ambienceOverlay: document.querySelector("#ambienceOverlay"),
+  ambienceClose: document.querySelector("#ambienceClose"),
+  ambButtons: [...document.querySelectorAll(".amb-btn")],
+  panelAmbienceVolume: document.querySelector("#panelAmbienceVolume"),
+  panelAmbienceVolumeValue: document.querySelector("#panelAmbienceVolumeValue"),
   rangeTabs: [...document.querySelectorAll(".range-tab")],
   taskList: document.querySelector("#taskList"),
   addTask: document.querySelector("#addTask"),
   completedCount: document.querySelector("#completedCount"),
   totalFocus: document.querySelector("#totalFocus"),
+  streakCount: document.querySelector("#streakCount"),
+  freezeCount: document.querySelector("#freezeCount"),
+  goalRingFg: document.querySelector("#goalRingFg"),
+  goalText: document.querySelector("#goalText"),
   navHome: document.querySelector("#navHome"),
   navSummary: document.querySelector("#navSummary"),
   settingsOpen: document.querySelector("#settingsOpen"),
   settingsClose: document.querySelector("#settingsClose"),
   settingsOverlay: document.querySelector("#settingsOverlay"),
-  settingsSearch: document.querySelector("#settingsSearch"),
-  settingsEmpty: document.querySelector("#settingsEmpty"),
   settingsForm: document.querySelector("#settingsForm"),
-  settingsSections: [...document.querySelectorAll(".settings-section")],
-  settingsNavLinks: [...document.querySelectorAll(".settings-rail a")],
   settingFocusMinutes: document.querySelector("#settingFocusMinutes"),
   settingShortMinutes: document.querySelector("#settingShortMinutes"),
   settingLongMinutes: document.querySelector("#settingLongMinutes"),
   settingAutoStartBreaks: document.querySelector("#settingAutoStartBreaks"),
   settingAutoStartPomodoros: document.querySelector("#settingAutoStartPomodoros"),
   settingLongBreakInterval: document.querySelector("#settingLongBreakInterval"),
+  settingDailyGoal: document.querySelector("#settingDailyGoal"),
   settingAutoCheckTasks: document.querySelector("#settingAutoCheckTasks"),
   settingCheckToBottom: document.querySelector("#settingCheckToBottom"),
   settingAlarmSound: document.querySelector("#settingAlarmSound"),
   testAlarmSound: document.querySelector("#testAlarmSound"),
   settingAlarmVolume: document.querySelector("#settingAlarmVolume"),
   alarmVolumeValue: document.querySelector("#alarmVolumeValue"),
-  settingAlarmRepeat: document.querySelector("#settingAlarmRepeat"),
+  settingAmbienceSound: document.querySelector("#settingAmbienceSound"),
+  settingAmbienceVolume: document.querySelector("#settingAmbienceVolume"),
+  ambienceVolumeValue: document.querySelector("#ambienceVolumeValue"),
   settingHourFormat: document.querySelector("#settingHourFormat"),
-  swatches: [...document.querySelectorAll(".swatch")],
+  themeSegButtons: [...document.querySelectorAll(".theme-seg button")],
+  themeToggle: document.querySelector("#themeToggle"),
 };
 
 let state = loadState();
 let tickTimer = null;
 let idleTimer = null;
 let finishTimer = null;
-let youtubeApiPromise = null;
-let musicPlayer = null;
 let summaryRange = "week";
 let summaryOffset = 0;
 let activeNav = "home";
+let ambiencePlaying = false;
 
-function syncTopbarOffset() {
-  if (!els.topbar) return;
-  const height = Math.ceil(els.topbar.getBoundingClientRect().height);
-  document.documentElement.style.setProperty("--topbar-height", `${height}px`);
-  document.body.style.paddingTop = `${height}px`;
-}
-
-function scheduleTopbarOffsetSync() {
-  syncTopbarOffset();
-  globalThis.requestAnimationFrame(() => {
-    syncTopbarOffset();
-  });
-  globalThis.setTimeout(() => {
-    syncTopbarOffset();
-  }, 120);
+function systemTheme() {
+  try {
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
+    }
+  } catch (error) {
+    /* ignore */
+  }
+  return "light";
 }
 
 function loadState() {
@@ -162,12 +163,13 @@ function loadState() {
     endsAt: null,
     completedFocus: 0,
     totalFocusSeconds: 0,
-    tasks: DEFAULT_TASKS,
+    tasks: makeDefaultTasks(),
     characterState: "cover",
     focusStreak: 0,
+    streakFreezes: 1,
+    freezeWeekKey: isoWeekKey(new Date()),
     sessions: [],
-    music: normalizeMusic(),
-    settings: DEFAULT_SETTINGS,
+    settings: { ...DEFAULT_SETTINGS, theme: systemTheme() },
   };
 
   try {
@@ -175,7 +177,7 @@ function loadState() {
     if (!saved || !MODES[saved.mode]) return fallback;
     const settings = normalizeSettings(saved.settings);
 
-    return {
+    const merged = {
       ...fallback,
       ...saved,
       running: false,
@@ -183,14 +185,32 @@ function loadState() {
       endsAt: null,
       settings,
       remaining: Number.isFinite(saved.remaining) ? saved.remaining : modeSeconds(saved.mode, settings),
-      tasks: Array.isArray(saved.tasks) && saved.tasks.length ? saved.tasks : DEFAULT_TASKS,
+      tasks: normalizeTasks(saved.tasks),
       sessions: Array.isArray(saved.sessions) ? saved.sessions : [],
       characterState: saved.characterState === "ignored" ? "cover" : saved.characterState || "cover",
-      music: normalizeMusic(saved.music),
+      streakFreezes: Number.isInteger(saved.streakFreezes) ? Math.max(0, saved.streakFreezes) : 1,
+      freezeWeekKey: typeof saved.freezeWeekKey === "string" ? saved.freezeWeekKey : isoWeekKey(new Date()),
     };
+    // Replenish the weekly freeze if the week rolled over while away.
+    const currentWeek = isoWeekKey(new Date());
+    if (merged.freezeWeekKey !== currentWeek) {
+      merged.freezeWeekKey = currentWeek;
+      merged.streakFreezes = 1;
+    }
+    return merged;
   } catch {
     return fallback;
   }
+}
+
+function normalizeTasks(tasks) {
+  if (!Array.isArray(tasks)) return [];
+  return tasks.map((task) => ({
+    id: typeof task.id === "string" ? task.id : createId(),
+    text: typeof task.text === "string" ? task.text : "",
+    done: Boolean(task.done),
+    est: clampNumber(task.est, 1, 20, 1),
+  }));
 }
 
 function normalizeSettings(settings = {}) {
@@ -203,21 +223,15 @@ function normalizeSettings(settings = {}) {
     autoStartBreaks: Boolean(merged.autoStartBreaks),
     autoStartPomodoros: Boolean(merged.autoStartPomodoros),
     longBreakInterval: clampNumber(merged.longBreakInterval, 2, 12, DEFAULT_SETTINGS.longBreakInterval),
+    dailyGoal: clampNumber(merged.dailyGoal, 1, 20, DEFAULT_SETTINGS.dailyGoal),
     autoCheckTasks: Boolean(merged.autoCheckTasks),
     checkToBottom: Boolean(merged.checkToBottom),
     alarmSound: validAudioValues.includes(merged.alarmSound) ? merged.alarmSound : DEFAULT_SETTINGS.alarmSound,
     alarmVolume: clampNumber(merged.alarmVolume, 0, 100, DEFAULT_SETTINGS.alarmVolume),
-    alarmRepeat: ALARM_PLAY_COUNT,
-    themeColor: typeof merged.themeColor === "string" ? merged.themeColor : DEFAULT_SETTINGS.themeColor,
+    ambienceSound: AMBIENCE_SOUNDS.includes(merged.ambienceSound) ? merged.ambienceSound : "off",
+    ambienceVolume: clampNumber(merged.ambienceVolume, 0, 100, DEFAULT_SETTINGS.ambienceVolume),
+    theme: merged.theme === "dark" ? "dark" : "light",
     hourFormat: merged.hourFormat === "12" ? "12" : "24",
-  };
-}
-
-function normalizeMusic(music = {}) {
-  return {
-    volume: clampNumber(music.volume, 0, 100, DEFAULT_MUSIC.volume),
-    playing: false,
-    playlistIndex: clampNumber(music.playlistIndex, 0, 999, DEFAULT_MUSIC.playlistIndex),
   };
 }
 
@@ -243,7 +257,6 @@ function saveState() {
     running: false,
     startedAt: null,
     endsAt: null,
-    music: { ...state.music, playing: false },
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
 }
@@ -262,9 +275,72 @@ function getProgress() {
 
 function setCharacter(nextState) {
   state.characterState = nextState;
-  els.characterArt.className = `cat-illustration state-${nextState}`;
-  els.speechBubble.textContent = SPEECH[nextState];
+  els.companionArt.className = `pose-frame state-${nextState}`;
+  els.companionLine.textContent = COMPANION_LINES[nextState] || COMPANION_LINES.cover;
 }
+
+function applyTheme() {
+  document.documentElement.dataset.theme = state.settings.theme === "dark" ? "dark" : "light";
+}
+
+/* ---------- streak freeze ---------- */
+
+function isoWeekKey(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const year = d.getUTCFullYear();
+  const start = new Date(Date.UTC(year, 0, 1));
+  const week = Math.ceil((d - start) / 86400000 / 7 + 1 / 7);
+  return `${year}-W${String(week).padStart(2, "0")}`;
+}
+
+function replenishFreezeCheck() {
+  const key = isoWeekKey(new Date());
+  if (state.freezeWeekKey !== key) {
+    state.freezeWeekKey = key;
+    state.streakFreezes = 1;
+    saveState();
+  }
+}
+
+function getDayStreak(uniqueDays) {
+  let streak = 0;
+  const cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+  let freezeAvailable = state.streakFreezes > 0;
+
+  for (;;) {
+    const key = toDateKey(cursor);
+    if (uniqueDays.has(key)) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+      continue;
+    }
+    // Bridge exactly one single missed day with a freeze, then keep counting.
+    if (freezeAvailable) {
+      const prev = new Date(cursor);
+      prev.setDate(prev.getDate() - 1);
+      if (uniqueDays.has(toDateKey(prev))) {
+        state.streakFreezes -= 1;
+        freezeAvailable = false;
+        saveState();
+        cursor.setDate(cursor.getDate() - 1);
+        continue;
+      }
+    }
+    break;
+  }
+
+  return streak;
+}
+
+function countTodaySessions() {
+  const today = toDateKey(new Date());
+  return getFocusSessions().filter((session) => toDateKey(new Date(session.completedAt)) === today).length;
+}
+
+/* ---------- timer core ---------- */
 
 function updateTimerFromClock() {
   if (!state.running || !state.endsAt) return;
@@ -286,6 +362,8 @@ function updateTimerFromClock() {
 function startTimer() {
   clearTimeout(finishTimer);
   clearTimeout(idleTimer);
+  hideCompleteBanner();
+  maybeRequestNotificationPermission();
   state.running = true;
   state.startedAt = Date.now();
   state.endsAt = state.startedAt + state.remaining * 1000;
@@ -313,6 +391,7 @@ function resetMode(mode) {
   state.endsAt = null;
   clearInterval(tickTimer);
   clearTimeout(finishTimer);
+  hideCompleteBanner();
   setCharacter(mode === "focus" ? "cover" : "break");
   scheduleIdle();
   saveState();
@@ -344,6 +423,8 @@ function completeSession() {
 
   saveState();
   render();
+  showCompleteBanner(state.mode);
+  notifyOnComplete(state.mode);
   playAlarmSequence();
 
   finishTimer = setTimeout(() => {
@@ -356,6 +437,39 @@ function completeSession() {
     scheduleIdle();
     if (shouldAutoStart(nextMode)) startTimer();
   }, 2300);
+}
+
+function showCompleteBanner(mode) {
+  if (!els.completeBanner) return;
+  els.completeBanner.textContent =
+    mode === "focus"
+      ? "Focus complete! Take a break."
+      : mode === "long"
+        ? "Long break over. Ready to focus?"
+        : "Break over. Ready for the next one?";
+  els.completeBanner.hidden = false;
+}
+
+function maybeRequestNotificationPermission() {
+  try {
+    if ("Notification" in window && Notification.permission === "default") {
+      const result = Notification.requestPermission();
+      if (result && typeof result.catch === "function") result.catch(() => {});
+    }
+  } catch (error) {
+    /* notifications unsupported */
+  }
+}
+
+function notifyOnComplete(mode) {
+  try {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    const body =
+      mode === "focus" ? "Focus complete \u2014 time for a break." : "Break over \u2014 ready for the next one?";
+    new Notification("Pomodoro by Hey Nous", { body });
+  } catch (error) {
+    /* ignore */
+  }
 }
 
 async function playAlarmSequence() {
@@ -443,6 +557,194 @@ function scheduleIdle() {
   }, IDLE_AFTER_MS);
 }
 
+/* ---------- generated ambience (Web Audio, on-device) ---------- */
+
+const ambienceEngine = {
+  ctx: null,
+  master: null,
+  current: null,
+
+  ensureCtx() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      this.ctx = new AC();
+      this.master = this.ctx.createGain();
+      this.master.connect(this.ctx.destination);
+    }
+    if (this.ctx.state === "suspended") {
+      this.ctx.resume().catch(() => {});
+    }
+    return true;
+  },
+
+  noiseBuffer(brown) {
+    const len = 2 * this.ctx.sampleRate;
+    const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    if (!brown) {
+      for (let i = 0; i < len; i += 1) d[i] = Math.random() * 2 - 1;
+    } else {
+      let last = 0;
+      for (let i = 0; i < len; i += 1) {
+        const white = Math.random() * 2 - 1;
+        last = (last + 0.02 * white) / 1.02;
+        d[i] = last * 3.5;
+      }
+    }
+    return buf;
+  },
+
+  play(sound) {
+    if (!this.ensureCtx()) return;
+    this.stop();
+    const ctx = this.ctx;
+    const out = ctx.createGain();
+    out.connect(this.master);
+    const stopFns = [];
+
+    const loopNoise = ({ brown = false, type = "lowpass", freq = 8000, q = 0.7, gain = 0.4 }) => {
+      const src = ctx.createBufferSource();
+      src.buffer = this.noiseBuffer(brown);
+      src.loop = true;
+      const filt = ctx.createBiquadFilter();
+      filt.type = type;
+      filt.frequency.value = freq;
+      filt.Q.value = q;
+      const g = ctx.createGain();
+      g.gain.value = gain;
+      src.connect(filt);
+      filt.connect(g);
+      g.connect(out);
+      src.start();
+      stopFns.push(() => {
+        try {
+          src.stop();
+        } catch (error) {
+          /* already stopped */
+        }
+      });
+      return { src, filt, g };
+    };
+
+    if (sound === "white") {
+      // softened hiss, like a distant waterfall
+      loopNoise({ brown: false, type: "lowpass", freq: 4500, gain: 0.32 });
+    } else if (sound === "brown") {
+      // deep rumble with a slow breathing swell
+      const { g } = loopNoise({ brown: true, type: "lowpass", freq: 520, gain: 0.5 });
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = 0.07;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 0.1;
+      lfo.connect(lfoGain);
+      lfoGain.connect(g.gain);
+      lfo.start();
+      stopFns.push(() => {
+        try {
+          lfo.stop();
+        } catch (error) {
+          /* already stopped */
+        }
+      });
+    } else if (sound === "rain") {
+      // low body rumble of steady rain
+      loopNoise({ brown: false, type: "lowpass", freq: 380, gain: 0.32 });
+      // pitter-patter: random droplet hits
+      const dropBuf = this.noiseBuffer(false);
+      const timer = setInterval(() => {
+        const n = 1 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < n; i += 1) {
+          const t = ctx.currentTime + Math.random() * 0.06;
+          const heavy = Math.random() < 0.18;
+          const src = ctx.createBufferSource();
+          src.buffer = dropBuf;
+          src.playbackRate.value = 0.8 + Math.random() * 0.7;
+          const bp = ctx.createBiquadFilter();
+          bp.type = "bandpass";
+          bp.frequency.value = heavy ? 380 + Math.random() * 520 : 1400 + Math.random() * 3200;
+          bp.Q.value = 7 + Math.random() * 5;
+          const g = ctx.createGain();
+          const peak = heavy ? 0.22 + Math.random() * 0.18 : 0.05 + Math.random() * 0.13;
+          const dur = heavy ? 0.09 + Math.random() * 0.06 : 0.03 + Math.random() * 0.05;
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(peak, t + 0.008);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          src.connect(bp);
+          bp.connect(g);
+          g.connect(out);
+          src.onended = () => {
+            src.disconnect();
+            bp.disconnect();
+            g.disconnect();
+          };
+          try {
+            src.start(t, Math.random() * 1.5, dur + 0.08);
+            src.stop(t + dur + 0.12);
+          } catch (error) {
+            /* skip this droplet */
+          }
+        }
+      }, 55);
+      stopFns.push(() => clearInterval(timer));
+    }
+
+    this.applyVolume();
+    this.current = {
+      stop: () => stopFns.forEach((fn) => fn()),
+    };
+    ambiencePlaying = true;
+  },
+
+  stop() {
+    if (this.current) {
+      this.current.stop();
+      this.current = null;
+    }
+    ambiencePlaying = false;
+  },
+
+  applyVolume() {
+    if (this.master) {
+      const v = state.settings.ambienceVolume / 100;
+      this.master.gain.value = 0.6 * v * v;
+    }
+  },
+};
+
+function setAmbience(sound) {
+  state.settings.ambienceSound = AMBIENCE_SOUNDS.includes(sound) ? sound : "off";
+  try {
+    if (state.settings.ambienceSound === "off") {
+      ambienceEngine.stop();
+    } else {
+      ambienceEngine.play(state.settings.ambienceSound);
+    }
+  } catch (error) {
+    console.warn("Ambience could not start.", error);
+  }
+  saveState();
+  renderAmbience();
+}
+
+function renderAmbience() {
+  els.ambienceOpen.classList.toggle("is-live", ambiencePlaying);
+  els.ambienceOpen.setAttribute(
+    "aria-label",
+    ambiencePlaying ? `Open background ambience, ${AMBIENCE_LABELS[state.settings.ambienceSound]} playing` : "Open background ambience",
+  );
+  els.ambButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.sound === state.settings.ambienceSound));
+  });
+  els.panelAmbienceVolume.value = state.settings.ambienceVolume;
+  els.panelAmbienceVolumeValue.value = state.settings.ambienceVolume;
+  els.settingAmbienceSound.value = state.settings.ambienceSound;
+  els.settingAmbienceVolume.value = state.settings.ambienceVolume;
+  els.ambienceVolumeValue.value = state.settings.ambienceVolume;
+}
+
+/* ---------- rendering ---------- */
+
 function renderTabs() {
   els.tabs.forEach((tab) => {
     const active = tab.dataset.mode === state.mode;
@@ -456,54 +758,97 @@ function renderTasks() {
 
   state.tasks.forEach((task) => {
     const item = document.createElement("li");
-    item.className = "task-item";
+    item.className = `task${task.done ? " done" : ""}`;
 
+    const check = document.createElement("label");
+    check.className = "check";
     const checkbox = document.createElement("input");
-    checkbox.className = "task-check";
     checkbox.type = "checkbox";
     checkbox.checked = task.done;
     checkbox.setAttribute("aria-label", `Mark ${task.text || "task"} complete`);
+    const box = document.createElement("span");
+    box.className = "box";
+    box.setAttribute("aria-hidden", "true");
+    check.append(checkbox, box);
     checkbox.addEventListener("change", () => {
       task.done = checkbox.checked;
+      if (task.done && state.settings.checkToBottom) {
+        state.tasks = [...state.tasks.filter((candidate) => candidate.id !== task.id), task];
+      }
       saveState();
+      renderTasks();
     });
 
     const input = document.createElement("input");
-    input.className = "task-text";
+    input.className = "task-input";
     input.value = task.text;
-    input.placeholder = "New sketch task";
+    input.placeholder = "New task";
+    input.setAttribute("aria-label", "Task name");
     input.addEventListener("input", () => {
       task.text = input.value;
       saveState();
     });
     input.addEventListener("focus", markAction);
 
-    const remove = document.createElement("button");
-    remove.className = "delete-task";
-    remove.type = "button";
-    remove.textContent = "x";
-    remove.setAttribute("aria-label", `Delete ${task.text || "task"}`);
-    remove.addEventListener("click", () => {
-      state.tasks = state.tasks.filter((candidate) => candidate.id !== task.id);
-      saveState();
-      renderTasks();
+    const estBadge = document.createElement("span");
+    estBadge.className = "task-est";
+    estBadge.dataset.estFor = task.id;
+    estBadge.textContent = `${task.est}\u00d7`;
+    estBadge.title = "Estimated pomodoros";
+    estBadge.hidden = task.est <= 1;
+
+    const menuBtn = document.createElement("button");
+    menuBtn.className = "task-menu-btn";
+    menuBtn.type = "button";
+    menuBtn.setAttribute("aria-label", `Options for ${task.text || "task"}`);
+    menuBtn.setAttribute("aria-expanded", "false");
+    menuBtn.setAttribute("aria-haspopup", "menu");
+    menuBtn.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>';
+    menuBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (taskMenu.hidden || menuTask?.id !== task.id) {
+        openTaskMenu(task, menuBtn);
+      } else {
+        closeTaskMenu();
+      }
     });
 
-    item.append(checkbox, input, remove);
+    item.append(check, input, estBadge, menuBtn);
     els.taskList.append(item);
   });
+  closeTaskMenu();
 }
 
 function render() {
-  els.timerDisplay.textContent = formatTime(state.remaining);
+  const time = formatTime(state.remaining);
+  els.timerDisplay.textContent = time;
   els.startStop.textContent = state.running ? "STOP" : "START";
-  els.runnerCat.style.setProperty("--progress", getProgress());
-  els.runnerCat.classList.toggle("is-running", state.running);
+  els.startStop.classList.toggle("is-stop", state.running);
+
+  const progress = getProgress();
+  els.journeyWalker.style.setProperty("--progress", progress.toFixed(4));
+  els.journeyWalker.classList.toggle("is-walking", state.running);
+  els.journeyFill.style.width = `${(progress * 100).toFixed(2)}%`;
+
   els.completedCount.textContent = state.completedFocus;
   els.totalFocus.textContent = `${Math.round(state.totalFocusSeconds / 60)}m`;
+
+  const uniqueDays = new Set(getFocusSessions().map((session) => toDateKey(new Date(session.completedAt))));
+  els.streakCount.textContent = getDayStreak(uniqueDays);
+  els.freezeCount.textContent = state.streakFreezes;
+
+  const todayCount = countTodaySessions();
+  const goal = state.settings.dailyGoal;
+  els.goalText.textContent = `${todayCount}/${goal}`;
+  els.goalRingFg.style.strokeDashoffset = (RING_CIRCUMFERENCE * (1 - Math.min(1, todayCount / goal))).toFixed(1);
+
+  document.title = state.running ? `(${time}) Pomodoro by Hey Nous` : PAGE_TITLE;
+
+  replenishFreezeCheck();
   renderTabs();
   renderPrimaryNav();
-  renderMusicPlayer();
+  renderAmbience();
   if (!els.activitySummary.hidden) renderActivitySummary();
 }
 
@@ -511,19 +856,18 @@ function showActivitySummary() {
   activeNav = "summary";
   summaryRange = "week";
   summaryOffset = 0;
-  document.body.classList.add("summary-open");
-  els.mainCard.classList.add("summary-mode");
+  els.timerView.hidden = true;
   els.activitySummary.hidden = false;
   renderActivitySummary();
   renderPrimaryNav();
+  window.scrollTo(0, 0);
   els.backToTimer.focus();
 }
 
 function showTimerView() {
   activeNav = "home";
   els.activitySummary.hidden = true;
-  els.mainCard.classList.remove("summary-mode");
-  document.body.classList.remove("summary-open");
+  els.timerView.hidden = false;
   renderPrimaryNav();
   els.openActivitySummary.focus();
 }
@@ -540,58 +884,24 @@ function renderActivitySummary() {
   const chart = getChartData(sessions, summaryRange, summaryOffset);
   els.summaryPeriod.textContent = chart.periodLabel;
   els.summaryBars.innerHTML = "";
-  const hoverHelper = document.createElement("div");
-  hoverHelper.className = "chart-hover-helper";
-  hoverHelper.setAttribute("aria-hidden", "true");
-  hoverHelper.hidden = true;
-  hoverHelper.innerHTML = `
-    <div class="chart-helper-line"></div>
-    <div class="chart-helper-tooltip"></div>
-  `;
-  els.summaryBars.append(hoverHelper);
-  const helperTooltip = hoverHelper.querySelector(".chart-helper-tooltip");
-
-  const hideChartHelper = () => {
-    hoverHelper.hidden = true;
-    hoverHelper.classList.remove("is-visible");
-  };
-
-  const showChartHelper = (item, bar, fill) => {
-    const helperRect = hoverHelper.getBoundingClientRect();
-    const fillRect = fill.getBoundingClientRect();
-    const lineX = fillRect.left - helperRect.left + fillRect.width / 2;
-    const tooltipY = Math.max(6, fillRect.top - helperRect.top - 40);
-    hoverHelper.style.setProperty("--helper-x", `${lineX.toFixed(1)}px`);
-    hoverHelper.style.setProperty("--helper-y", `${tooltipY.toFixed(1)}px`);
-    helperTooltip.textContent = `${item.label}: ${formatSummaryBarValue(item.hours)}`;
-    hoverHelper.hidden = false;
-    hoverHelper.classList.add("is-visible");
-  };
 
   chart.items.forEach((item) => {
+    const col = document.createElement("div");
+    col.className = "bar-col";
+    col.tabIndex = 0;
+    col.setAttribute("role", "img");
+    const tip = `${item.label}: ${formatSummaryBarValue(item.hours)}`;
+    col.setAttribute("aria-label", tip);
+    col.dataset.tip = tip;
+    const barHeight = Math.max(6, (item.hours / chart.maxHours) * 150);
     const bar = document.createElement("div");
-    const barHeight = Math.max(2, (item.hours / chart.maxHours) * 145);
-    bar.className = "bar-item";
-    bar.tabIndex = 0;
-    bar.setAttribute("role", "img");
-    bar.setAttribute("aria-label", `${item.label}: ${formatSummaryBarValue(item.hours)}`);
-    bar.innerHTML = `
-      <div class="bar-track">
-        <div class="bar-fill" style="--bar-height: ${barHeight.toFixed(1)}px"></div>
-      </div>
-      <div class="bar-label">${item.label}</div>
-    `;
-    const fill = bar.querySelector(".bar-fill");
-    const activate = () => showChartHelper(item, bar, fill);
-    bar.addEventListener("mouseenter", activate);
-    bar.addEventListener("mousemove", activate);
-    bar.addEventListener("click", activate);
-    bar.addEventListener("focus", activate);
-    bar.addEventListener("focusin", activate);
-    bar.addEventListener("mouseleave", hideChartHelper);
-    bar.addEventListener("blur", hideChartHelper);
-    bar.addEventListener("focusout", hideChartHelper);
-    els.summaryBars.append(bar);
+    bar.className = "bar";
+    bar.style.height = `${barHeight.toFixed(1)}px`;
+    const lab = document.createElement("div");
+    lab.className = "bar-lab";
+    lab.textContent = item.label;
+    col.append(bar, lab);
+    els.summaryBars.append(col);
   });
 
   els.rangeTabs.forEach((tab) => {
@@ -617,177 +927,13 @@ function renderPrimaryNav() {
   els.settingsOpen.classList.toggle("is-active", current === "settings");
 }
 
-function formatMusicTime(seconds) {
-  if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
-  const whole = Math.floor(seconds);
-  const minutes = Math.floor(whole / 60);
-  const remainder = String(whole % 60).padStart(2, "0");
-  return `${minutes}:${remainder}`;
-}
-
 function syncBodyModalState() {
-  const anyModalOpen = !els.settingsOverlay.hidden || !els.summaryConfirmOverlay.hidden || !els.musicOverlay.hidden;
+  const anyModalOpen =
+    !els.settingsOverlay.hidden || !els.summaryConfirmOverlay.hidden || !els.ambienceOverlay.hidden;
   document.body.classList.toggle("modal-open", anyModalOpen);
 }
 
-function loadYouTubeApi() {
-  if (globalThis.YT?.Player) return Promise.resolve();
-  if (youtubeApiPromise) return youtubeApiPromise;
-
-  youtubeApiPromise = new Promise((resolve) => {
-    const previousReady = globalThis.onYouTubeIframeAPIReady;
-    globalThis.onYouTubeIframeAPIReady = () => {
-      previousReady?.();
-      resolve();
-    };
-
-    const existing = document.querySelector('script[data-youtube-iframe-api="true"]');
-    if (!existing) {
-      const script = document.createElement("script");
-      script.src = "https://www.youtube.com/iframe_api";
-      script.async = true;
-      script.dataset.youtubeIframeApi = "true";
-      document.head.append(script);
-    }
-  });
-
-  return youtubeApiPromise;
-}
-
-function renderMusicPlayer() {
-  if (!els.musicOverlay) return;
-
-  els.musicTrackTitle ||= document.querySelector("#musicTitle");
-  els.musicTrackArtist ||= document.querySelector("#musicTrackArtist");
-  els.musicPlayPause ||= document.querySelector("#musicPlayPause");
-  els.homeMusic ||= document.querySelector("#homeMusic");
-
-  if (!els.musicTrackTitle || !els.musicTrackArtist || !els.musicPlayPause || !els.homeMusic) return;
-
-  const currentIndex = musicPlayer?.getPlaylistIndex?.() ?? state.music.playlistIndex ?? 0;
-  const duration = musicPlayer?.getDuration?.() || 0;
-  const currentTime = musicPlayer?.getCurrentTime?.() || 0;
-  const videoData = musicPlayer?.getVideoData?.() || {};
-  const title = videoData.title || MUSIC_PLAYLIST_TITLE;
-  const artist = videoData.author || "YouTube";
-
-  els.musicPlayPause.textContent = state.music.playing ? "Pause" : "Play";
-  els.musicTrackTitle.textContent = title;
-  els.musicTrackArtist.textContent = artist;
-  els.homeMusic.classList.toggle("is-live", state.music.playing);
-  els.homeMusic.setAttribute(
-    "aria-label",
-    state.music.playing ? "Open background music, currently playing" : "Open background music",
-  );
-  state.music.playlistIndex = currentIndex;
-}
-
-async function ensureMusicPlayer() {
-  if (musicPlayer) return musicPlayer;
-
-  await loadYouTubeApi();
-
-  musicPlayer = new YT.Player(els.musicEmbed, {
-    width: "100%",
-    height: "100%",
-    playerVars: {
-      listType: "playlist",
-      list: MUSIC_PLAYLIST_ID,
-      index: state.music.playlistIndex || 0,
-      rel: 0,
-      modestbranding: 1,
-      playsinline: 1,
-      controls: 1,
-      iv_load_policy: 3,
-      origin: window.location.origin,
-    },
-    events: {
-      onReady: (event) => {
-        if (state.music.playing) {
-          event.target.playVideo();
-        } else {
-          event.target.pauseVideo();
-        }
-        renderMusicPlayer();
-      },
-      onStateChange: (event) => {
-        if (!musicPlayer) return;
-        const playingState = globalThis.YT?.PlayerState?.PLAYING;
-        const pausedState = globalThis.YT?.PlayerState?.PAUSED;
-        if (event.data === playingState) {
-          state.music.playing = true;
-        } else if (event.data === pausedState) {
-          state.music.playing = false;
-        }
-        state.music.playlistIndex = musicPlayer.getPlaylistIndex?.() ?? state.music.playlistIndex;
-        saveState();
-        renderMusicPlayer();
-      },
-    },
-  });
-
-  return musicPlayer;
-}
-
-async function playMusic() {
-  await ensureMusicPlayer();
-  try {
-    musicPlayer.playVideo();
-    state.music.playing = true;
-    saveState();
-    renderMusicPlayer();
-  } catch (error) {
-    console.warn("Music could not play.", error);
-  }
-}
-
-function pauseMusic() {
-  if (!musicPlayer) return;
-  musicPlayer.pauseVideo();
-  state.music.playing = false;
-  saveState();
-  renderMusicPlayer();
-}
-
-function toggleMusicPlayback() {
-  if (state.music.playing) {
-    pauseMusic();
-  } else {
-    playMusic();
-  }
-}
-
-async function playNextMusicTrack(autoplay = true) {
-  await ensureMusicPlayer();
-  if (!musicPlayer) return;
-  musicPlayer.nextVideo();
-  state.music.playing = autoplay;
-  saveState();
-  renderMusicPlayer();
-}
-
-async function playPreviousMusicTrack(autoplay = true) {
-  await ensureMusicPlayer();
-  if (!musicPlayer) return;
-  musicPlayer.previousVideo();
-  state.music.playing = autoplay;
-  saveState();
-  renderMusicPlayer();
-}
-
-async function openMusicPlayer() {
-  els.musicOverlay.hidden = false;
-  syncBodyModalState();
-  await ensureMusicPlayer();
-  renderMusicPlayer();
-  els.musicClose.focus();
-}
-
-function closeMusicPlayer() {
-  els.musicOverlay.hidden = true;
-  syncBodyModalState();
-  els.homeMusic.focus();
-}
+/* ---------- sessions & charts ---------- */
 
 function getFocusSessions() {
   if (state.sessions.length) return state.sessions;
@@ -812,19 +958,6 @@ function toDateKey(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
-function getDayStreak(uniqueDays) {
-  let streak = 0;
-  const cursor = new Date();
-  cursor.setHours(0, 0, 0, 0);
-
-  while (uniqueDays.has(toDateKey(cursor))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return streak || 0;
-}
-
 function resetSummaryData() {
   summaryRange = "week";
   summaryOffset = 0;
@@ -832,6 +965,8 @@ function resetSummaryData() {
   state.completedFocus = 0;
   state.totalFocusSeconds = 0;
   state.focusStreak = 0;
+  state.streakFreezes = 1;
+  state.freezeWeekKey = isoWeekKey(new Date());
   saveState();
   render();
   if (!els.activitySummary.hidden) renderActivitySummary();
@@ -943,6 +1078,8 @@ function formatPeriodRange(start, end) {
   return `${start.toLocaleDateString(undefined, { month: "short", day: "numeric" })} - ${end.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 }
 
+/* ---------- settings ---------- */
+
 function renderSettings() {
   renderAudioOptions(els.settingAlarmSound, state.settings.alarmSound);
   els.settingFocusMinutes.value = state.settings.focusMinutes;
@@ -951,15 +1088,18 @@ function renderSettings() {
   els.settingAutoStartBreaks.checked = state.settings.autoStartBreaks;
   els.settingAutoStartPomodoros.checked = state.settings.autoStartPomodoros;
   els.settingLongBreakInterval.value = state.settings.longBreakInterval;
+  els.settingDailyGoal.value = state.settings.dailyGoal;
   els.settingAutoCheckTasks.checked = state.settings.autoCheckTasks;
   els.settingCheckToBottom.checked = state.settings.checkToBottom;
   els.settingAlarmSound.value = state.settings.alarmSound;
   els.settingAlarmVolume.value = state.settings.alarmVolume;
   els.alarmVolumeValue.value = state.settings.alarmVolume;
-  els.settingAlarmRepeat.value = state.settings.alarmRepeat;
+  els.settingAmbienceSound.value = state.settings.ambienceSound;
+  els.settingAmbienceVolume.value = state.settings.ambienceVolume;
+  els.ambienceVolumeValue.value = state.settings.ambienceVolume;
   els.settingHourFormat.value = state.settings.hourFormat;
-  els.swatches.forEach((swatch) => {
-    swatch.classList.toggle("is-active", swatch.dataset.theme.toLowerCase() === state.settings.themeColor.toLowerCase());
+  els.themeSegButtons.forEach((button) => {
+    button.setAttribute("aria-selected", String(button.dataset.themeVal === state.settings.theme));
   });
 }
 
@@ -979,15 +1119,10 @@ function renderAudioOptions(select, selectedValue) {
   select.value = selectedValue;
 }
 
-function applyTheme() {
-  document.documentElement.style.setProperty("--yellow", state.settings.themeColor);
-}
-
 function openSettings() {
   activeNav = "settings";
   renderPrimaryNav();
   renderSettings();
-  filterSettings();
   els.settingsOverlay.hidden = false;
   syncBodyModalState();
   els.settingsClose.focus();
@@ -1001,59 +1136,34 @@ function closeSettings() {
   els.settingsOpen.focus();
 }
 
-function filterSettings() {
-  const query = els.settingsSearch.value.trim().toLowerCase();
-  let visibleCount = 0;
-
-  els.settingsSections.forEach((section) => {
-    const matches = !query || section.textContent.toLowerCase().includes(query);
-    section.classList.toggle("is-filtered-out", !matches);
-    if (matches) visibleCount += 1;
-  });
-
-  els.settingsNavLinks.forEach((link) => {
-    const target = document.querySelector(link.getAttribute("href"));
-    link.classList.toggle("is-filtered-out", target?.classList.contains("is-filtered-out"));
-  });
-
-  els.settingsEmpty.classList.toggle("is-visible", visibleCount === 0);
-}
-
-function scrollSettingsSection(sectionId) {
-  const section = document.querySelector(sectionId);
-  if (!section || section.classList.contains("is-filtered-out")) return;
-
-  const formTop = els.settingsForm.getBoundingClientRect().top;
-  const sectionTop = section.getBoundingClientRect().top;
-  els.settingsForm.scrollTo({
-    top: els.settingsForm.scrollTop + sectionTop - formTop,
-    behavior: "smooth",
-  });
-
-  els.settingsNavLinks.forEach((link) => {
-    link.classList.toggle("is-active", link.getAttribute("href") === sectionId);
-  });
-}
-
 function updateSettingsFromForm() {
+  const prevAmbience = state.settings.ambienceSound;
   state.settings = normalizeSettings({
-    ...state.settings,
     focusMinutes: els.settingFocusMinutes.value,
     shortMinutes: els.settingShortMinutes.value,
     longMinutes: els.settingLongMinutes.value,
     autoStartBreaks: els.settingAutoStartBreaks.checked,
     autoStartPomodoros: els.settingAutoStartPomodoros.checked,
     longBreakInterval: els.settingLongBreakInterval.value,
+    dailyGoal: els.settingDailyGoal.value,
     autoCheckTasks: els.settingAutoCheckTasks.checked,
     checkToBottom: els.settingCheckToBottom.checked,
     alarmSound: els.settingAlarmSound.value,
     alarmVolume: els.settingAlarmVolume.value,
-    alarmRepeat: els.settingAlarmRepeat.value,
+    ambienceSound: els.settingAmbienceSound.value,
+    ambienceVolume: els.settingAmbienceVolume.value,
+    theme: state.settings.theme,
     hourFormat: els.settingHourFormat.value,
   });
 
   if (!state.running) {
     state.remaining = modeSeconds(state.mode);
+  }
+
+  if (state.settings.ambienceSound !== prevAmbience) {
+    setAmbience(state.settings.ambienceSound);
+  } else {
+    ambienceEngine.applyVolume();
   }
 
   applyTheme();
@@ -1062,11 +1172,56 @@ function updateSettingsFromForm() {
   render();
 }
 
+function setTheme(next) {
+  state.settings.theme = next === "dark" ? "dark" : "light";
+  applyTheme();
+  renderSettings();
+  saveState();
+}
+
+/* ---------- ambience panel ---------- */
+
+function openAmbience() {
+  renderAmbience();
+  els.ambienceOverlay.hidden = false;
+  syncBodyModalState();
+  els.ambienceClose.focus();
+}
+
+function closeAmbience() {
+  els.ambienceOverlay.hidden = true;
+  syncBodyModalState();
+  els.ambienceOpen.focus();
+}
+
+/* ---------- events ---------- */
+
 function markAction() {
   if (!state.running && state.characterState === "ignored") {
     setCharacter(state.mode === "focus" ? "cover" : "break");
   }
   scheduleIdle();
+  resumeAmbience();
+}
+
+// Browsers block audio until a user gesture: a persisted ambience setting
+// (e.g. Rain) is restored to the UI on load but silent until the user
+// interacts. Resume it on the first gesture so "selected" never means silent.
+function resumeAmbience() {
+  if (state.settings.ambienceSound !== "off" && !ambiencePlaying) {
+    try {
+      ambienceEngine.play(state.settings.ambienceSound);
+      // play() alone never refreshes the nav dot; without this the sound
+      // can resume while the UI still shows it as off.
+      renderAmbience();
+    } catch (error) {
+      /* stays silent until the next gesture */
+    }
+  }
+}
+
+function hideCompleteBanner() {
+  if (els.completeBanner) els.completeBanner.hidden = true;
 }
 
 els.startStop.addEventListener("click", () => {
@@ -1078,6 +1233,11 @@ els.startStop.addEventListener("click", () => {
   }
 });
 
+els.resetTimer.addEventListener("click", () => {
+  markAction();
+  resetMode(state.mode);
+});
+
 els.tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     markAction();
@@ -1087,11 +1247,11 @@ els.tabs.forEach((tab) => {
 
 els.addTask.addEventListener("click", () => {
   markAction();
-  const task = { id: createId(), text: "", done: false };
+  const task = { id: createId(), text: "", done: false, est: 1 };
   state.tasks.push(task);
   saveState();
   renderTasks();
-  const input = els.taskList.lastElementChild?.querySelector(".task-text");
+  const input = els.taskList.lastElementChild?.querySelector(".task-input");
   input?.focus();
 });
 
@@ -1106,20 +1266,38 @@ els.navHome.addEventListener("click", () => {
   els.navHome.focus();
 });
 els.backToTimer.addEventListener("click", showTimerView);
-els.homeMusic.addEventListener("click", openMusicPlayer);
 els.summaryReset.addEventListener("click", openSummaryConfirm);
 els.summaryConfirmCancel.addEventListener("click", closeSummaryConfirm);
 els.summaryConfirmOk.addEventListener("click", confirmSummaryReset);
 els.summaryConfirmOverlay.addEventListener("click", (event) => {
   if (event.target === els.summaryConfirmOverlay) closeSummaryConfirm();
 });
-els.musicClose.addEventListener("click", closeMusicPlayer);
-els.musicOverlay.addEventListener("click", (event) => {
-  if (event.target === els.musicOverlay) closeMusicPlayer();
+
+els.ambienceOpen.addEventListener("click", () => {
+  markAction();
+  openAmbience();
 });
-els.musicPlayPause.addEventListener("click", toggleMusicPlayback);
-els.musicPrev.addEventListener("click", () => playPreviousMusicTrack(true));
-els.musicNext.addEventListener("click", () => playNextMusicTrack(true));
+els.ambienceClose.addEventListener("click", closeAmbience);
+els.ambienceOverlay.addEventListener("click", (event) => {
+  if (event.target === els.ambienceOverlay) closeAmbience();
+});
+els.ambButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    markAction();
+    setAmbience(button.dataset.sound);
+  });
+});
+els.panelAmbienceVolume.addEventListener("input", () => {
+  state.settings.ambienceVolume = Number(els.panelAmbienceVolume.value);
+  els.panelAmbienceVolumeValue.value = els.panelAmbienceVolume.value;
+  els.settingAmbienceVolume.value = els.panelAmbienceVolume.value;
+  els.ambienceVolumeValue.value = els.panelAmbienceVolume.value;
+  ambienceEngine.applyVolume();
+});
+els.panelAmbienceVolume.addEventListener("change", () => {
+  state.settings.ambienceVolume = Number(els.panelAmbienceVolume.value);
+  saveState();
+});
 
 els.rangeTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
@@ -1143,57 +1321,144 @@ els.settingsOpen.addEventListener("click", () => {
   markAction();
   openSettings();
 });
-
 els.settingsClose.addEventListener("click", closeSettings);
-
 els.settingsOverlay.addEventListener("click", (event) => {
   if (event.target === els.settingsOverlay) closeSettings();
 });
-
 els.settingsForm.addEventListener("input", updateSettingsFromForm);
 els.settingsForm.addEventListener("change", updateSettingsFromForm);
-
-els.settingsSearch.addEventListener("input", filterSettings);
-
 els.testAlarmSound.addEventListener("click", () => {
   testSelectedAudio();
 });
-
-els.settingsNavLinks.forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    scrollSettingsSection(link.getAttribute("href"));
+els.themeSegButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setTheme(button.dataset.themeVal);
   });
 });
+els.themeToggle.addEventListener("click", () => {
+  setTheme(state.settings.theme === "dark" ? "light" : "dark");
+});
 
-els.swatches.forEach((swatch) => {
-  swatch.addEventListener("click", () => {
-    state.settings.themeColor = swatch.dataset.theme;
-    applyTheme();
-    renderSettings();
-    saveState();
-  });
+const menuToggle = document.getElementById("menuToggle");
+const topnav = document.getElementById("topnav");
+function setMenu(open) {
+  topnav.classList.toggle("open", open);
+  menuToggle.setAttribute("aria-expanded", String(open));
+  menuToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+}
+menuToggle.addEventListener("click", (event) => {
+  event.stopPropagation();
+  setMenu(!topnav.classList.contains("open"));
+});
+document.addEventListener("click", (event) => {
+  if (topnav.classList.contains("open") && !topnav.contains(event.target)) setMenu(false);
+});
+topnav.addEventListener("click", (event) => {
+  if (event.target.closest("button")) setMenu(false);
+});
+
+const taskMenu = document.getElementById("taskMenu");
+const menuEstMinus = document.getElementById("menuEstMinus");
+const menuEstN = document.getElementById("menuEstN");
+const menuEstPlus = document.getElementById("menuEstPlus");
+const menuDelete = document.getElementById("menuDelete");
+let menuTask = null;
+
+function syncMenuEst() {
+  if (!menuTask) return;
+  menuEstN.textContent = `${menuTask.est}\u00d7`;
+  menuEstMinus.disabled = menuTask.est <= 1;
+  menuEstPlus.disabled = menuTask.est >= 20;
+  const badge = els.taskList.querySelector(`[data-est-for="${menuTask.id}"]`);
+  if (badge) {
+    badge.textContent = `${menuTask.est}\u00d7`;
+    badge.hidden = menuTask.est <= 1;
+  }
+}
+
+function openTaskMenu(task, anchor) {
+  menuTask = task;
+  syncMenuEst();
+  taskMenu.hidden = false;
+  const rect = anchor.getBoundingClientRect();
+  taskMenu.style.top = `${Math.max(8, Math.min(rect.bottom + 8, window.innerHeight - 170))}px`;
+  taskMenu.style.left = "auto";
+  taskMenu.style.right = `${Math.max(8, window.innerWidth - rect.right)}px`;
+  anchor.setAttribute("aria-expanded", "true");
+}
+
+function closeTaskMenu() {
+  if (taskMenu.hidden) return;
+  taskMenu.hidden = true;
+  menuTask = null;
+  document
+    .querySelectorAll('.task-menu-btn[aria-expanded="true"]')
+    .forEach((btn) => btn.setAttribute("aria-expanded", "false"));
+}
+
+menuEstMinus.addEventListener("click", () => {
+  if (!menuTask) return;
+  menuTask.est = Math.max(1, menuTask.est - 1);
+  saveState();
+  syncMenuEst();
+});
+menuEstPlus.addEventListener("click", () => {
+  if (!menuTask) return;
+  menuTask.est = Math.min(20, menuTask.est + 1);
+  saveState();
+  syncMenuEst();
+});
+menuDelete.addEventListener("click", () => {
+  if (!menuTask) return;
+  state.tasks = state.tasks.filter((candidate) => candidate.id !== menuTask.id);
+  saveState();
+  renderTasks();
+});
+document.addEventListener("click", (event) => {
+  if (!taskMenu.hidden && !taskMenu.contains(event.target) && !event.target.closest(".task-menu-btn")) {
+    closeTaskMenu();
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !taskMenu.hidden) closeTaskMenu();
 });
 
 document.addEventListener("pointerdown", markAction);
 document.addEventListener("keydown", markAction);
-globalThis.addEventListener("resize", scheduleTopbarOffsetSync);
-globalThis.addEventListener("load", scheduleTopbarOffsetSync);
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !els.musicOverlay.hidden) {
-    closeMusicPlayer();
+  if (event.key === "Escape") {
+    if (!els.ambienceOverlay.hidden) {
+      closeAmbience();
+      return;
+    }
+    if (!els.summaryConfirmOverlay.hidden) {
+      closeSummaryConfirm();
+      return;
+    }
+    if (!els.settingsOverlay.hidden) closeSettings();
     return;
   }
-  if (event.key === "Escape" && !els.summaryConfirmOverlay.hidden) {
-    closeSummaryConfirm();
+
+  if (event.code !== "Space" && event.key !== " ") return;
+  const target = event.target;
+  if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT" || target.isContentEditable)) {
     return;
   }
-  if (event.key === "Escape" && !els.settingsOverlay.hidden) closeSettings();
+  if (target && target.tagName === "BUTTON") return;
+  if (!els.settingsOverlay.hidden || !els.ambienceOverlay.hidden || !els.summaryConfirmOverlay.hidden) return;
+  event.preventDefault();
+  markAction();
+  if (state.running) {
+    stopTimer();
+  } else {
+    startTimer();
+  }
 });
 
+/* ---------- init ---------- */
+
 applyTheme();
-scheduleTopbarOffsetSync();
-document.fonts?.ready?.then(scheduleTopbarOffsetSync);
+replenishFreezeCheck();
 renderTasks();
 setCharacter(state.characterState);
 render();
@@ -1201,6 +1466,10 @@ renderSettings();
 renderPrimaryNav();
 scheduleIdle();
 
-if (globalThis.ResizeObserver && els.topbar) {
-  new ResizeObserver(scheduleTopbarOffsetSync).observe(els.topbar);
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch((error) => {
+      console.warn("Service worker registration failed.", error);
+    });
+  });
 }
