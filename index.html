@@ -90,6 +90,8 @@
             <button class="tab" role="tab" type="button" data-mode="long" aria-selected="false">Long Break</button>
           </div>
 
+          <p id="completeBanner" class="complete-banner" role="status" hidden></p>
+
           <div id="timerDisplay" class="timer" aria-live="polite">25:00</div>
 
           <div class="journey" aria-label="Timer progress">
@@ -107,6 +109,7 @@
           </div>
 
           <button id="startStop" class="btn-primary" type="button">START</button>
+          <button id="resetTimer" class="btn-subtle" type="button">Reset timer</button>
         </section>
 
         <section class="companion" aria-label="Nous companion">
@@ -126,10 +129,10 @@
           <div class="stat">
             <div class="v">
               <span id="streakCount">0</span>
-              <svg class="freeze" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <svg class="freeze" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" title="Streak freezes left: one per week, bridges a missed day">
                 <path d="M12 2v20M4 6l16 12M20 6L4 18M12 2l-2.5 2.5M12 2l2.5 2.5M12 22l-2.5-2.5M12 22l2.5-2.5" />
               </svg>
-              <span id="freezeCount" class="freeze-n">1</span>
+              <span id="freezeCount" class="freeze-n" title="Streak freezes left: one per week, bridges a missed day">1</span>
             </div>
             <div class="l">Day streak</div>
           </div>
@@ -178,7 +181,7 @@
         <div class="metrics">
           <article class="card metric">
             <div class="v" id="summaryHours">--</div>
-            <div class="l">Hours Focused</div>
+            <div class="l">Total focus</div>
           </article>
           <article class="card metric">
             <div class="v" id="summaryDays">--</div>
@@ -365,6 +368,7 @@
             <p>
               Pomodoro by Hey Nous is a focus timer that lives entirely in your browser &mdash;
               no account, no tracking, and your data never leaves this device.
+              Your streak is protected by one freeze per week, which bridges a single missed day.
             </p>
             <p class="about-links">
               Related: <a href="https://tool.nous.my.id" target="_blank" rel="noopener">developer tools</a>

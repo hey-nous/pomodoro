@@ -54,10 +54,7 @@ function createId() {
 }
 
 function makeDefaultTasks() {
-  return [
-    { id: createId(), text: "Sketch the main landing page hero layout", done: true, est: 2 },
-    { id: createId(), text: "Refine Pomodoro interaction styles", done: false, est: 1 },
-  ];
+  return [];
 }
 
 const COMPANION_LINES = {
@@ -74,6 +71,8 @@ const els = {
   tabs: [...document.querySelectorAll(".tab")],
   timerDisplay: document.querySelector("#timerDisplay"),
   startStop: document.querySelector("#startStop"),
+  resetTimer: document.querySelector("#resetTimer"),
+  completeBanner: document.querySelector("#completeBanner"),
   journeyWalker: document.querySelector("#journeyWalker"),
   journeyFill: document.querySelector("#journeyFill"),
   companionArt: document.querySelector("#companionArt"),
@@ -205,7 +204,7 @@ function loadState() {
 }
 
 function normalizeTasks(tasks) {
-  if (!Array.isArray(tasks) || !tasks.length) return makeDefaultTasks();
+  if (!Array.isArray(tasks)) return [];
   return tasks.map((task) => ({
     id: typeof task.id === "string" ? task.id : createId(),
     text: typeof task.text === "string" ? task.text : "",
@@ -363,6 +362,7 @@ function updateTimerFromClock() {
 function startTimer() {
   clearTimeout(finishTimer);
   clearTimeout(idleTimer);
+  hideCompleteBanner();
   maybeRequestNotificationPermission();
   state.running = true;
   state.startedAt = Date.now();
@@ -391,6 +391,7 @@ function resetMode(mode) {
   state.endsAt = null;
   clearInterval(tickTimer);
   clearTimeout(finishTimer);
+  hideCompleteBanner();
   setCharacter(mode === "focus" ? "cover" : "break");
   scheduleIdle();
   saveState();
@@ -422,6 +423,7 @@ function completeSession() {
 
   saveState();
   render();
+  showCompleteBanner(state.mode);
   notifyOnComplete(state.mode);
   playAlarmSequence();
 
@@ -435,6 +437,17 @@ function completeSession() {
     scheduleIdle();
     if (shouldAutoStart(nextMode)) startTimer();
   }, 2300);
+}
+
+function showCompleteBanner(mode) {
+  if (!els.completeBanner) return;
+  els.completeBanner.textContent =
+    mode === "focus"
+      ? "Focus complete! Take a break."
+      : mode === "long"
+        ? "Long break over. Ready to focus?"
+        : "Break over. Ready for the next one?";
+  els.completeBanner.hidden = false;
 }
 
 function maybeRequestNotificationPermission() {
@@ -759,6 +772,9 @@ function renderTasks() {
     check.append(checkbox, box);
     checkbox.addEventListener("change", () => {
       task.done = checkbox.checked;
+      if (task.done && state.settings.checkToBottom) {
+        state.tasks = [...state.tasks.filter((candidate) => candidate.id !== task.id), task];
+      }
       saveState();
       renderTasks();
     });
@@ -773,6 +789,13 @@ function renderTasks() {
       saveState();
     });
     input.addEventListener("focus", markAction);
+
+    const estBadge = document.createElement("span");
+    estBadge.className = "task-est";
+    estBadge.dataset.estFor = task.id;
+    estBadge.textContent = `${task.est}\u00d7`;
+    estBadge.title = "Estimated pomodoros";
+    estBadge.hidden = task.est <= 1;
 
     const menuBtn = document.createElement("button");
     menuBtn.className = "task-menu-btn";
@@ -791,7 +814,7 @@ function renderTasks() {
       }
     });
 
-    item.append(check, input, menuBtn);
+    item.append(check, input, estBadge, menuBtn);
     els.taskList.append(item);
   });
   closeTaskMenu();
@@ -1178,6 +1201,24 @@ function markAction() {
     setCharacter(state.mode === "focus" ? "cover" : "break");
   }
   scheduleIdle();
+  resumeAmbience();
+}
+
+// Browsers block audio until a user gesture: a persisted ambience setting
+// (e.g. Rain) is restored to the UI on load but silent until the user
+// interacts. Resume it on the first gesture so "selected" never means silent.
+function resumeAmbience() {
+  if (state.settings.ambienceSound !== "off" && !ambiencePlaying) {
+    try {
+      ambienceEngine.play(state.settings.ambienceSound);
+    } catch (error) {
+      /* stays silent until the next gesture */
+    }
+  }
+}
+
+function hideCompleteBanner() {
+  if (els.completeBanner) els.completeBanner.hidden = true;
 }
 
 els.startStop.addEventListener("click", () => {
@@ -1187,6 +1228,11 @@ els.startStop.addEventListener("click", () => {
   } else {
     startTimer();
   }
+});
+
+els.resetTimer.addEventListener("click", () => {
+  markAction();
+  resetMode(state.mode);
 });
 
 els.tabs.forEach((tab) => {
@@ -1320,6 +1366,11 @@ function syncMenuEst() {
   menuEstN.textContent = `${menuTask.est}\u00d7`;
   menuEstMinus.disabled = menuTask.est <= 1;
   menuEstPlus.disabled = menuTask.est >= 20;
+  const badge = els.taskList.querySelector(`[data-est-for="${menuTask.id}"]`);
+  if (badge) {
+    badge.textContent = `${menuTask.est}\u00d7`;
+    badge.hidden = menuTask.est <= 1;
+  }
 }
 
 function openTaskMenu(task, anchor) {
