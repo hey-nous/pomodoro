@@ -1,9 +1,10 @@
 /* Pomodoro by Hey Nous — offline-first service worker (cache-first, same-origin only). */
-const CACHE_NAME = "pomo-v1";
+const CACHE_NAME = "pomo-v2";
 const PRECACHE = [
   "/",
   "/index.html",
   "/styles.css",
+  "/poses.css",
   "/app.js",
   "/manifest.json",
   "/assets/favicon.svg",
