@@ -1425,6 +1425,26 @@ document.addEventListener("keydown", (event) => {
 
 document.addEventListener("pointerdown", markAction);
 document.addEventListener("keydown", markAction);
+
+// Lazy-load the session-state mascot poses (focus/almost/timesup/done/
+// break/ignored) once the browser is idle, the page has loaded, or the user
+// first interacts — whichever comes first. They must never block first paint.
+let restPosesLoaded = false;
+function loadRestPoses() {
+  if (restPosesLoaded) return;
+  restPosesLoaded = true;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "poses-rest.css";
+  document.head.appendChild(link);
+}
+if (typeof requestIdleCallback === "function") {
+  requestIdleCallback(loadRestPoses, { timeout: 2000 });
+} else {
+  setTimeout(loadRestPoses, 1000);
+}
+window.addEventListener("load", loadRestPoses);
+document.addEventListener("pointerdown", loadRestPoses, { once: true });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     if (!els.ambienceOverlay.hidden) {
