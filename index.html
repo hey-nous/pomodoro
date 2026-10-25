@@ -65,6 +65,11 @@
     }
     </script>
     <link rel="stylesheet" href="styles.css" />
+    <!-- First-paint mascot poses (cover, walker, goal cup) load non-blocking:
+         the timer paints from the small critical stylesheet first. The six
+         session-state poses ship in poses-rest.css, lazy-loaded by app.js. -->
+    <link rel="preload" href="poses-first.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="poses-first.css" /></noscript>
   </head>
   <body>
     <header class="topbar">
